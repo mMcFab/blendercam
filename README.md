@@ -1,3 +1,17 @@
+#Custom fork of BlenderCAM with some neat features!
+
+* Added an experimental g-code post-processor compatible with Marlin based machines
+* Custom tool-changing routine compatible with Marlin based machines
+* Made tool definitions actually kind of work
+
+Things I'm still adding are:
+* Completely re-designed "tool-shelf" system - define cutters once in a tool shelf and select them, instead of defining per-operation. 
+
+
+
+# Below is the original ReadMe, which I have kept since it has a bunch of useful links
+
+
 ![BlenderCAM](./static/logo.png)
 
 # BlenderCam - CNC path addon
