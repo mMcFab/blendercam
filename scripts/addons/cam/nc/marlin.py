@@ -7,6 +7,8 @@ import traceback
 
 now = datetime.datetime.now()
 
+#Gcode post-processor for Marlin Compatibility
+
 class Creator(iso.Creator):
 	def __init__(self):
 		iso.Creator.__init__(self)
