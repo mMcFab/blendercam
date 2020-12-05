@@ -1,4 +1,4 @@
-#Custom fork of BlenderCAM with some neat features!
+# Custom fork of BlenderCAM with some neat features!
 
 * Added an experimental g-code post-processor compatible with Marlin based machines
 * Custom tool-changing routine compatible with Marlin based machines
