@@ -1258,7 +1258,7 @@ def exportGcodePath(filename, vertslist, operations):
 			if c.output_comment_before_tool_change:
 				c.comment('Tool change - D = %s type %s flutes %s' % (
 				strInUnits(o.cutter_diameter, 4), o.cutter_type, o.cutter_flutes))
-			#Commented out because Bad™
+			#Commented out because of tweaks
 			#print(dir(o));
 			c.tool_defn(o.cutter_id, o.cutter_name, {'diameter': o.cutter_diameter, 'type': o.cutter_type, 'flutes': o.cutter_flutes, 'cutting edge height': o.cutter_length, 'tip angle': o.cutter_tip_angle, 'description': o.cutter_description, 'name': o.cutter_name, 'id': o.cutter_id})
 			c.tool_change(o.cutter_id)
@@ -1418,7 +1418,7 @@ def exportGcodePath(filename, vertslist, operations):
 				if c.output_comment_before_tool_change:
 					c.comment('Tool change - D = %s type %s flutes %s' % (
 					strInUnits(o.cutter_diameter, 4), o.cutter_type, o.cutter_flutes))
-				#Commented out because Bad™
+				#Commented out because reasons
 				#print(dir(o));
 				c.tool_defn(o.cutter_id, o.cutter_name, {'diameter': o.cutter_diameter, 'type': o.cutter_type, 'flutes': o.cutter_flutes, 'cutting edge height': o.cutter_length, 'tip angle': o.cutter_tip_angle, 'description': o.cutter_description, 'name': o.cutter_name, 'id': o.cutter_id})
 				c.tool_change(o.cutter_id)
