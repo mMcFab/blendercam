@@ -10,7 +10,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -142,7 +142,9 @@ class machineSettings(bpy.types.PropertyGroup):
                                         ('GRAVOS', 'Gravos', 'Gravos'),
                                         ('WIN-PC', 'WinPC-NC', 'German CNC by Burkhard Lewetz'),
                                         ('SHOPBOT MTC', 'ShopBot MTC', 'ShopBot MTC'),
-                                        ('LYNX_OTTER_O', 'Lynx Otter o', 'Lynx Otter o')),
+                                        ('LYNX_OTTER_O', 'Lynx Otter o', 'Lynx Otter o'),
+                                        ('MARLIN', 'Marlin',
+                                         'gcode processed to be compatible with Marlin based 3D printers')),
                                  description='Post processor',
                                  default='MACH3')
     # units = EnumProperty(name='Units', items = (('IMPERIAL', ''))
@@ -342,7 +344,7 @@ def updateCutout(o, context):
 
 
 # if o.outlines_count>1:
-#	o.use_bridges=False
+#   o.use_bridges=False
 
 
 def updateExact(o, context):
@@ -532,11 +534,12 @@ class camOperation(bpy.types.PropertyGroup):
                                     min=0.000001, max=10, default=0.003, precision=PRECISION, unit="LENGTH",
                                     update=updateOffsetImage)
     cutter_length: FloatProperty(name="#Cutter length", description="#not supported#Cutter length", min=0.0, max=100.0,
-                                  default=25.0, precision=PRECISION, unit="LENGTH", update=updateOffsetImage)
+                                  default=0.025, precision=PRECISION, unit="LENGTH", update=updateOffsetImage)
     cutter_flutes: IntProperty(name="Cutter flutes", description="Cutter flutes", min=1, max=20, default=2,
                                 update=updateChipload)
     cutter_tip_angle: FloatProperty(name="Cutter v-carve angle", description="Cutter v-carve angle", min=0.0,
                                      max=180.0, default=60.0, precision=PRECISION, update=updateOffsetImage)
+    cutter_name: StringProperty(name="Tool Name", default="tool", update=updateOffsetImage)
     cutter_description: StringProperty(name="Tool Description", default="", update=updateOffsetImage)
 
     # steps
@@ -660,7 +663,7 @@ class camOperation(bpy.types.PropertyGroup):
                                    description="Radius around the part which will be milled if ambient is set to Around",
                                    min=0.0, max=100.0, default=0.01, precision=PRECISION, unit="LENGTH",
                                    update=updateRest)
-    # ambient_cutter = EnumProperty(name='Borders',items=(('EXTRAFORCUTTER', 'Extra for cutter', "Extra space for cutter is cut around the segment"),('ONBORDER', "Cutter on edge", "Cutter goes exactly on edge of ambient with it's middle") ,('INSIDE', "Inside segment", 'Cutter stays within segment')	 ),description='handling of ambient and cutter size',default='INSIDE')
+    # ambient_cutter = EnumProperty(name='Borders',items=(('EXTRAFORCUTTER', 'Extra for cutter', "Extra space for cutter is cut around the segment"),('ONBORDER', "Cutter on edge", "Cutter goes exactly on edge of ambient with it's middle") ,('INSIDE', "Inside segment", 'Cutter stays within segment')  ),description='handling of ambient and cutter size',default='INSIDE')
     use_limit_curve: bpy.props.BoolProperty(name="Use limit curve", description="A curve limits the operation area",
                                              default=False, update=updateRest)
     ambient_cutter_restrict: bpy.props.BoolProperty(name="Cutter stays in ambient limits",
