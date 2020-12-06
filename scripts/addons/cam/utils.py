@@ -880,13 +880,13 @@ def createSimulationObject(name, operations, i):
 		bpy.ops.object.modifier_add(type='SUBSURF')
 		ss = ob.modifiers[-1]
 		ss.subdivision_type = 'SIMPLE'
-		ss.levels = 5
-		ss.render_levels = 6
-		bpy.ops.object.modifier_add(type='SUBSURF')
-		ss = ob.modifiers[-1]
-		ss.subdivision_type = 'SIMPLE'
-		ss.levels = 3
-		ss.render_levels = 3
+		ss.levels = 8
+		ss.render_levels = 8
+		#bpy.ops.object.modifier_add(type='SUBSURF')
+		#ss = ob.modifiers[-1]
+		#ss.subdivision_type = 'SIMPLE'
+		#ss.levels = 3
+		#ss.render_levels = 3
 		bpy.ops.object.modifier_add(type='DISPLACE')
 
 	#ob.location = ((o.max.x + o.min.x) / 2, (o.max.y + o.min.y) / 2, o.min.z)
