@@ -866,6 +866,10 @@ def createSimulationObject(name, operations, i):
 
 	o = operations[0]
 
+	o_min_z = o.min.z
+	for op in operations:
+		o_min_z = min(o_min_z, op.min.z)
+
 	if oname in bpy.data.objects:
 		ob = bpy.data.objects[oname]
 	else:
@@ -885,7 +889,8 @@ def createSimulationObject(name, operations, i):
 		ss.render_levels = 3
 		bpy.ops.object.modifier_add(type='DISPLACE')
 
-	ob.location = ((o.max.x + o.min.x) / 2, (o.max.y + o.min.y) / 2, o.min.z)
+	#ob.location = ((o.max.x + o.min.x) / 2, (o.max.y + o.min.y) / 2, o.min.z)
+	ob.location = ((o.max.x + o.min.x) / 2, (o.max.y + o.min.y) / 2, o_min_z)
 	ob.scale.x = (o.max.x - o.min.x) / 2
 	ob.scale.y = (o.max.y - o.min.y) / 2
 	print(o.max.x, o.min.x)

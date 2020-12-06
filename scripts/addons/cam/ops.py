@@ -413,9 +413,12 @@ class CAMSimulateChain(bpy.types.Operator):
         chainops = getChainOperations(chain)
 
         canSimulate = True
+        
         for operation in chainops:
-            if not operation.name in bpy.data.objects:
+            if ("cam_path_" + operation.name) not in bpy.data.objects:
                 canSimulate = False
+                break
+                
         if canSimulate:
             utils.doSimulation(chain.name, chainops)
         else:
