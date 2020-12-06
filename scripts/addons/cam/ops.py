@@ -1297,3 +1297,142 @@ class CamObjectSilhouete(bpy.types.Operator):
         bpy.context.scene.cursor.location = ob.location
         bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
         return {'FINISHED'}
+    
+
+
+class CuttingToolAdd(bpy.types.Operator):
+    """Add new Cutting Tool"""
+    bl_idname = "scene.cam_cutting_tool_add"
+    bl_label = "Add new Cutting Tool"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return context.scene is not None
+
+    def execute(self, context):
+        # main(context)
+        s = bpy.context.scene
+
+        max_existing_id = 0
+        max_existing_static_id = -1
+
+        for tool in s.cam_cutting_tools:
+            max_existing_id = max(max_existing_id, tool.cutter_id)
+            print(int(tool.cutter_static_id))
+            max_existing_static_id = max(max_existing_static_id, (tool.cutter_static_id))
+
+        #new_static_id = 0
+
+
+        s.cam_cutting_tools.add()
+        o = s.cam_cutting_tools[-1]
+        s.cam_active_cutting_tool = len(s.cam_cutting_tools) - 1
+        o.cutter_id = max_existing_id + 1
+        o.cutter_name = 'Tool_' + str(o.cutter_id)
+        o.cutter_static_id = (max_existing_static_id + 1)
+        
+        print("New static ID ", o.cutter_static_id);
+
+        #o.filename = o.name
+
+        return {'FINISHED'}
+
+
+class CuttingToolCopy(bpy.types.Operator):
+    """Copy Cutting Tool"""
+    bl_idname = "scene.cam_cutting_tool_copy"
+    bl_label = "Copy active Cutting Tool"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return context.scene is not None
+
+    def execute(self, context):
+        # main(context)
+        s = bpy.context.scene
+
+        s = bpy.context.scene
+        s.cam_cutting_tools.add()
+        copyop = s.cam_cutting_tools[s.cam_active_cutting_tool]
+        s.cam_active_cutting_tool += 1
+        l = len(s.cam_cutting_tools) - 1
+        s.cam_cutting_tools.move(l, s.cam_active_cutting_tool)
+        o = s.cam_cutting_tools[s.cam_active_cutting_tool]
+
+        for k in copyop.keys():
+            o[k] = copyop[k]
+
+        ####get digits in the end
+
+        isdigit = True
+        numdigits = 0
+
+        if o.name[-1].isdigit():
+            numdigits = 1
+            while isdigit:
+                numdigits += 1
+                isdigit = o.name[-numdigits].isdigit()
+            numdigits -= 1
+            o.name = o.name[:-numdigits] + str(int(o.name[-numdigits:]) + 1).zfill(numdigits)
+            
+        else:
+            o.name = o.name + '_copy'
+            
+
+        return {'FINISHED'}
+
+
+class CuttingToolRemove(bpy.types.Operator):
+    """Remove Cutting Tool"""
+    bl_idname = "scene.cam_cutting_tool_remove"
+    bl_label = "Remove Cutting Tool"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return context.scene is not None
+
+    def execute(self, context):
+        bpy.context.scene.cam_cutting_tools.remove(bpy.context.scene.cam_active_cutting_tool)
+        if bpy.context.scene.cam_active_cutting_tool > 0:
+            bpy.context.scene.cam_active_cutting_tool -= 1
+
+        return {'FINISHED'}
+
+
+
+# move cam operation in the list up or down
+class CuttingToolMove(bpy.types.Operator):
+    """Move Cutting Tool"""
+    bl_idname = "scene.cam_cutting_tool_move"
+    bl_label = "Move Cutting Tool in list"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    direction: EnumProperty(name='direction',
+                             items=(('UP', 'Up', ''), ('DOWN', 'Down', '')),
+                             description='direction',
+                             default='DOWN')
+
+    @classmethod
+    def poll(cls, context):
+        return context.scene is not None
+
+    def execute(self, context):
+        # main(context)
+        
+        a = bpy.context.scene.cam_active_cutting_tool
+        cops = bpy.context.scene.cam_cutting_tools
+        if self.direction == 'UP':
+            if a > 0:
+                cops.move(a, a - 1)
+                bpy.context.scene.cam_active_cutting_tool -= 1
+
+        else:
+            if a < len(cops) - 1:
+                cops.move(a, a + 1)
+                bpy.context.scene.cam_active_cutting_tool += 1
+
+        return {'FINISHED'}
+

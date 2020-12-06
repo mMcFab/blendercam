@@ -1,5 +1,5 @@
 import bpy
-d = bpy.context.scene.cam_operations[bpy.context.scene.cam_active_operation]
+d = bpy.context.scene.cam_cutting_tools[bpy.context.scene.cam_active_cutting_tool]
 
 d.cutter_type = 'BALL'
 d.cutter_diameter = 0.0035

@@ -448,7 +448,7 @@ class Creator(nc.Creator):
 	def tool_change(self, id):
 		if self.output_comment_before_tool_change:
 			if id in self.tool_defn_params:
-				self.comment('tool change to ' + self.tool_defn_params[id]['name']);
+				self.comment('tool change to ' + self.tool_defn_params[id]['name'])
 
 		if self.output_cutviewer_comments:
 			import cutviewer

@@ -22,8 +22,10 @@ class Creator(iso.Creator):
 		self.m_codes_on_their_own_line = True
 		self.output_tool_change = True
 		self.output_comment_before_tool_change = True
+		#Used to disable unnecessary output of a toolchange for the first tool
 		self.first_tool = True
 		self.free_movement_height = 200
+		self.current_tool_definition = None
 
 	def PROGRAM_END(self):	return('M5')
 	#optimize
@@ -126,11 +128,11 @@ class Creator(iso.Creator):
 			
 			
 			self.feed(x=None, y=None, z=self.free_movement_height)
-			self.write(self.SPACE() + 'M5 ;stop the spindle\n');
-			self.write(self.SPACE() + 'G4 S2 ;dwell for 2 second to give some spin-down time\n');
+			self.write(self.SPACE() + 'M5 ;stop the spindle\n')
+			self.write(self.SPACE() + 'G4 S2 ;dwell for 2 second to give some spin-down time\n')
 			self.rapid(x=0, y=0, z=resting_z)
-			self.write(self.SPACE() + 'M1 Change Tool + Click... ;Await user confirmation\n');
-			self.write(self.SPACE() + 'G4 S1 ;dwell for 1 second to give some user escape time\n');
+			self.write(self.SPACE() + 'M1 Change Tool + Click... ;Await user confirmation\n')
+			self.write(self.SPACE() + 'G4 S1 ;dwell for 1 second to give some user escape time\n')
 			self.rapid(x=None, y=None, z=self.free_movement_height)
 			#Shorter tools make part go lower. Shift_z is additive. eg, new tool is shorter, shift_z must be negative small - big = negative
 			#self.shift_z += ([new tool height] - [old tool height])
@@ -199,10 +201,11 @@ class Creator(iso.Creator):
 # These are selected by values from 1 to 9 inclusive.
 	def workplane(self, id):
 		if ((id >= 1) and (id <= 6)):
-			self.write_blocknum()
+			#I haven't seen blocknum defined anywhere in the Creator stuff? Also VS Code is upset it is not defined 
+			#self.write_blocknum()
 			self.write( (self.WORKPLANE() % (id + self.WORKPLANE_BASE())) + '\t; (Select Relative Coordinate System)\n')
 		if ((id >= 7) and (id <= 9)):
-			self.write_blocknum()
+			#self.write_blocknum()
 			self.write( ((self.WORKPLANE() % (6 + self.WORKPLANE_BASE())) + ('.%i' % (id - 6))) + '\t; (Select Relative Coordinate System)\n')
 
 

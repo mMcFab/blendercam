@@ -44,43 +44,58 @@ class CAMButtonsPanel():
 
 class CAM_CUTTER_Panel(CAMButtonsPanel, bpy.types.Panel):
     """CAM cutter panel"""
-    bl_label = " "
+    bl_label = "CAM Cutter"
     bl_idname = "WORLD_PT_CAM_CUTTER"
 
     COMPAT_ENGINES = {'BLENDERCAM_RENDER'}
 
-    def draw_header(self, context):
-        self.layout.menu("CAM_CUTTER_MT_presets", text="CAM Cutter")
+    #def draw_header(self, context):
+    #    self.layout.menu("CAM_CUTTER_MT_presets", text="CAM Cutter")
 
     def draw(self, context):
         layout = self.layout
         d = bpy.context.scene
         if len(d.cam_operations) > 0:
             ao = d.cam_operations[d.cam_active_operation]
+            if len(d.cam_cutting_tools) > 0:
+                #layout.label(text='Pick a tool!')
+                layout.prop(ao, 'cutting_tool')
+                #at = current tool selection...
+                # if ao.use_exact and at.cutter_type == 'CUSTOM':
+                #     layout.label(text='Warning - only convex shapes are supported. ', icon='COLOR_RED')
+                #     layout.label(text='If your custom cutter is concave,')
+                #     layout.label(text='switch exact mode off.')
 
-            if ao:
-                # cutter preset
-                row = layout.row(align=True)
-                row.menu("CAM_CUTTER_MT_presets", text=bpy.types.CAM_CUTTER_MT_presets.bl_label)
-                row.operator("render.cam_preset_cutter_add", text="", icon='ADD')
-                row.operator("render.cam_preset_cutter_add", text="", icon='REMOVE').remove_active = True
-                layout.prop(ao, 'cutter_id')
-                layout.prop(ao, 'cutter_type')
-                if ao.cutter_type == 'VCARVE':
-                    layout.prop(ao, 'cutter_tip_angle')
-                if ao.cutter_type == 'CUSTOM':
-                    if ao.use_exact:
-                        layout.label(text='Warning - only convex shapes are supported. ', icon='COLOR_RED')
-                        layout.label(text='If your custom cutter is concave,')
-                        layout.label(text='switch exact mode off.')
 
-                    layout.prop_search(ao, "cutter_object_name", bpy.data, "objects")
+            else:
+                #Please define a cutting tool
+                layout.label(text='No Cutting Tools Defined! Please define one', icon='COLOR_RED')
+        else:
+            layout.label(text='Add operation first')
+            # if ao:
+            #     # cutter preset
+            #     row = layout.row(align=True)
+            #     row.menu("CAM_CUTTER_MT_presets", text=bpy.types.CAM_CUTTER_MT_presets.bl_label)
+            #     row.operator("render.cam_preset_cutter_add", text="", icon='ADD')
+            #     row.operator("render.cam_preset_cutter_add", text="", icon='REMOVE').remove_active = True
+            #     layout.prop(ao, 'cutter_id')
+            #     layout.prop(ao, 'cutter_type')
+            #     if ao.cutter_type == 'VCARVE':
+            #         layout.prop(ao, 'cutter_tip_angle')
+            #     if ao.cutter_type == 'CUSTOM':
+            #         if ao.use_exact:
+            #             layout.label(text='Warning - only convex shapes are supported. ', icon='COLOR_RED')
+            #             layout.label(text='If your custom cutter is concave,')
+            #             layout.label(text='switch exact mode off.')
 
-                layout.prop(ao, 'cutter_diameter')
-                layout.prop(ao,'cutter_length')
-                layout.prop(ao, 'cutter_flutes')
-                layout.prop(ao, 'cutter_name')
-                layout.prop(ao, 'cutter_description')
+            #         layout.prop_search(ao, "cutter_object_name", bpy.data, "objects")
+
+            #     layout.prop(ao, 'cutter_diameter')
+            #     layout.prop(ao,'cutter_length')
+            #     layout.prop(ao, 'cutter_flutes')
+            #     layout.prop(ao, 'cutter_name')
+            #     layout.prop(ao, 'cutter_description')
+        
 
 
 class CAM_MACHINE_Panel(CAMButtonsPanel, bpy.types.Panel):
@@ -179,6 +194,18 @@ class CAM_MATERIAL_Panel(CAMButtonsPanel, bpy.types.Panel):
                     layout.label(text='Estimated from image')
 
 
+class CAM_UL_cutting_tools(UIList):
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        # assert(isinstance(item, bpy.types.VertexGroup)
+        #operation = item
+        if self.layout_type in {'DEFAULT', 'COMPACT'}:
+
+            layout.label(text=item.cutter_name, translate=False, icon_value=icon)
+            
+        elif self.layout_type in {'GRID'}:
+            layout.alignment = 'CENTER'
+            layout.label(text="", icon_value=icon)
+
 class CAM_UL_operations(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         # assert(isinstance(item, bpy.types.VertexGroup)
@@ -197,7 +224,7 @@ class CAM_UL_operations(UIList):
 class CAM_UL_orientations(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
         # assert(isinstance(item, bpy.types.VertexGroup)
-        operation = item
+        #operation = item
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
 
             layout.label(text=item.name, translate=False, icon_value=icon)
@@ -361,6 +388,72 @@ class CAM_OPERATIONS_Panel(CAMButtonsPanel, bpy.types.Panel):
                     layout.prop(ao, 'use_modifiers')
                 layout.prop(ao, 'hide_all_others')
                 layout.prop(ao, 'parent_path_to_object')
+
+
+class CAM_CUTTING_TOOLS_Panel(CAMButtonsPanel, bpy.types.Panel):
+    """Cutting Tools panel"""
+    bl_label = "Cutting Tools"
+    bl_idname = "WORLD_PT_CAM_CUTTING_TOOLS"
+
+    COMPAT_ENGINES = {'BLENDERCAM_RENDER'}
+    #def draw_header(self, context):
+    #    self.layout.menu("CAM_CUTTER_MT_presets", text="Cutting Tools")
+
+    def draw(self, context):
+        layout = self.layout
+
+        row = layout.row()
+        scene = bpy.context.scene
+        row.template_list("CAM_UL_cutting_tools", '', scene, "cam_cutting_tools", scene, 'cam_active_cutting_tool')
+        #row.template_list("CAM_UL_chains", '', scene, "cam_chains", scene, 'cam_active_chain')
+        
+        col = row.column(align=True)
+        col.operator("scene.cam_cutting_tool_add", icon='ADD', text="")
+        col.operator("scene.cam_cutting_tool_copy", icon='COPYDOWN', text="")
+        col.operator("scene.cam_cutting_tool_remove", icon='REMOVE', text="")
+        # if collection:
+        col.separator()
+        col.operator("scene.cam_cutting_tool_move", icon='TRIA_UP', text="").direction = 'UP'
+        col.operator("scene.cam_cutting_tool_move", icon='TRIA_DOWN', text="").direction = 'DOWN'
+        # row = layout.row()
+
+        if len(scene.cam_cutting_tools) > 0:
+            #use_experimental = bpy.context.preferences.addons['cam'].preferences.experimental
+            ao = scene.cam_cutting_tools[scene.cam_active_cutting_tool]
+            
+            row = layout.row(align=True)
+            #row.menu("CAM_OPERATION_MT_presets", text=bpy.types.CAM_OPERATION_MT_presets.bl_label)
+            #row.operator("render.cam_preset_operation_add", text="", icon='ADD')
+            #row.operator("render.cam_preset_operation_add", text="", icon='REMOVE').remove_active = True
+            row.menu("CAM_CUTTER_MT_presets", text=bpy.types.CAM_CUTTER_MT_presets.bl_label)
+            row.operator("render.cam_preset_cutter_add", text="", icon='ADD')
+            row.operator("render.cam_preset_cutter_add", text="", icon='REMOVE').remove_active = True
+                
+
+            if ao:
+                #sub = layout.column()
+                #layout.prop(ao, 'cutter_static_id')#Hidden! only here for debug
+                layout.prop(ao, 'cutter_name')
+                #sub.prop(ao, 'cutter_description')
+                # cutter preset
+                #row = layout.row(align=True)
+                layout.prop(ao, 'cutter_id')
+                layout.prop(ao, 'cutter_type')
+                if ao.cutter_type == 'VCARVE':
+                    layout.prop(ao, 'cutter_tip_angle')
+                if ao.cutter_type == 'CUSTOM':
+                    layout.prop_search(ao, "cutter_object_name", bpy.data, "objects")
+
+                
+                layout.prop(ao, 'cutter_diameter')
+                layout.prop(ao,'cutter_total_length')
+
+                #layout.prop(ao,'cutter_length')
+                layout.prop(ao, 'cutter_flutes')
+                #layout.prop(ao, 'cutter_name')
+                layout.prop(ao, 'cutter_description')
+
+                
 
 
 class CAM_INFO_Panel(CAMButtonsPanel, bpy.types.Panel):

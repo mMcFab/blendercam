@@ -1,13 +1,13 @@
-# Custom fork of BlenderCAM with some neat features!
+# Custom fork of BlenderCAM with some simple (but potentially useful) features and changes!
 
-* Added an experimental g-code post-processor compatible with Marlin based machines
+* Added an experimental g-code post-processor compatible with [Marlin](https://github.com/MarlinFirmware/Marlin) based machines
 * Custom tool-changing routine compatible with Marlin based machines
 * Made tool definitions actually kind of work
 
 Things I'm still adding are:
 * Completely re-designed "tool-shelf" system - define cutters once in a tool shelf and select them, instead of defining per-operation. 
 
-
+Unfortunately, old tool pre-sets can't just be imported directly into my modified system, so you'll need to manually copy the values over if you switch from the original repo. 
 
 # Below is the original ReadMe, which I have kept since it has a bunch of useful links
 

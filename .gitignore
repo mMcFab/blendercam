@@ -8,6 +8,7 @@ config/bookmarks.txt
 /scripts/templates_osl/
 /scripts/templates_py/
 /scripts/addons_contrib/
+/scripts/addons/cam/__pycache__/
 *.spi1d
 *.pyc
 *.ocio

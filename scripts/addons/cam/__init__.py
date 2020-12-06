@@ -401,6 +401,67 @@ def getStrategyList(scene, context):
                       ('PROJECTED_CURVE', 'Projected curve - EXPERIMENTAL', 'project 1 curve towards other curve')])
     return items
 
+def getCuttingToolList(scene, context):
+    s = bpy.context.scene
+    items = []
+    #print(s.cam_cutting_tools)
+    for tool in s.cam_cutting_tools: 
+        #print(dir(tool))
+        items.extend([(str(tool.cutter_static_id), tool.cutter_name, tool.cutter_description)])
+        
+    #for i in range(0, len(s.cam_cutting_tools)):
+        #tool = s.cam_cutting_tools[i]
+        #print(dir(tool))
+        #print(tool)
+    #    items.extend([(tool, tool.cutter_name, tool.cutter_description)])
+    return items
+
+class CuttingToolDefinition(bpy.types.PropertyGroup):
+    cutter_name: bpy.props.StringProperty(name="Tool Name", default="Tool", update=updateRest)
+    cutter_description: StringProperty(name="Tool Description", default="", update=updateRest)
+    
+    cutter_type: EnumProperty(name='Type',
+                              items=(
+                                  ('END', 'Flat End', 'end - flat cutter'),
+                                  ('BALLNOSE', 'Ballnose', 'ballnose cutter'),
+                                  ('VCARVE', 'V-carve', 'v carve cutter'),
+                                  ('BALL', 'Sphere', 'Sphere cutter'),
+                                  ('CUSTOM', 'Custom-EXPERIMENTAL', 'modelled cutter - not well tested yet.')),
+                              description='Type of cutter used',
+                              default='END', update=updateZbufferImage)
+    cutter_object_name: bpy.props.StringProperty(name='Cutter object',
+                                                  description='object used as custom cutter for this operation',
+                                                  update=updateZbufferImage)
+
+    cutter_id: IntProperty(name="Tool number", description="For machines which support tool change based on tool id",
+                           min=0, max=10000, default=1, update=updateRest)
+
+    cutter_diameter: FloatProperty(name="Cutter diameter", description="Cutter diameter = 2x cutter radius",
+                                    min=0.000001, max=10, default=0.003, precision=PRECISION, unit="LENGTH",
+                                    update=updateOffsetImage)
+
+    cutter_length: FloatProperty(name="#Cutting edge height", description="#not supported#Cutter length", min=0.0, max=100.0,
+                                  default=0.025, precision=PRECISION, unit="LENGTH", update=updateOffsetImage)
+
+    cutter_total_length: FloatProperty(name="Total Tool Length", description="Used for tool change clearance and automatic z adjustment in some cases", min=0.0, max=100.0,
+                                  default=0.025, precision=PRECISION, unit="LENGTH", update=updateOffsetImage)
+
+    #cutter_shank_length: FloatProperty(name="Tool Shank Length", description="Used for automatic z-adjustment on tool change", min=0.0, max=100.0,
+    #                              default=0.025, precision=PRECISION, unit="LENGTH", update=updateOffsetImage)
+
+
+    cutter_flutes: IntProperty(name="Cutter flutes", description="Cutter flutes", min=1, max=20, default=2,
+                                update=updateChipload)
+    cutter_tip_angle: FloatProperty(name="Cutter v-carve angle", description="Cutter v-carve angle", min=0.0,
+                                     max=180.0, default=60.0, precision=PRECISION, update=updateOffsetImage)
+
+    #Just so I can use it as an enum (and maintain the same cutter if parameters are tweaked)
+    cutter_static_id: IntProperty(name="Static ID", description="Internal Static ID", min=0, max=1024, default=0)
+
+    #def createDict():
+
+    
+
 
 class camOperation(bpy.types.PropertyGroup):
     name: bpy.props.StringProperty(name="Operation Name", default="Operation", update=updateRest)
@@ -433,18 +494,24 @@ class camOperation(bpy.types.PropertyGroup):
                                       ('IMAGE', 'Image', 'a')),
                                   description='Geometry source',
                                   default='OBJECT', update=updateOperationValid)
-    cutter_type: EnumProperty(name='Cutter',
-                              items=(
-                                  ('END', 'End', 'end - flat cutter'),
-                                  ('BALLNOSE', 'Ballnose', 'ballnose cutter'),
-                                  ('VCARVE', 'V-carve', 'v carve cutter'),
-                                  ('BALL', 'Sphere', 'Sphere cutter'),
-                                  ('CUSTOM', 'Custom-EXPERIMENTAL', 'modelled cutter - not well tested yet.')),
-                              description='Type of cutter used',
-                              default='END', update=updateZbufferImage)
-    cutter_object_name: bpy.props.StringProperty(name='Cutter object',
-                                                  description='object used as custom cutter for this operation',
-                                                  update=updateZbufferImage)
+    # cutter_type: EnumProperty(name='Cutter',
+    #                           items=(
+    #                               ('END', 'End', 'end - flat cutter'),
+    #                               ('BALLNOSE', 'Ballnose', 'ballnose cutter'),
+    #                               ('VCARVE', 'V-carve', 'v carve cutter'),
+    #                               ('BALL', 'Sphere', 'Sphere cutter'),
+    #                               ('CUSTOM', 'Custom-EXPERIMENTAL', 'modelled cutter - not well tested yet.')),
+    #                           description='Type of cutter used',
+    #                           default='END', update=updateZbufferImage)
+    # cutter_object_name: bpy.props.StringProperty(name='Cutter object',
+    #                                               description='object used as custom cutter for this operation',
+    #                                               update=updateZbufferImage)
+    
+    #Target tool definition
+    cutting_tool: EnumProperty(name='Cutting Tool',
+                                items=getCuttingToolList,
+                                description='Cutting tool used for this operation')
+
 
     machine_axes: EnumProperty(name='Number of axes',
                                 items=(
@@ -528,19 +595,19 @@ class camOperation(bpy.types.PropertyGroup):
                                           min=1, max=32, update=updateCutout)
 
     # cutter
-    cutter_id: IntProperty(name="Tool number", description="For machines which support tool change based on tool id",
-                           min=0, max=10000, default=1, update=updateRest)
-    cutter_diameter: FloatProperty(name="Cutter diameter", description="Cutter diameter = 2x cutter radius",
-                                    min=0.000001, max=10, default=0.003, precision=PRECISION, unit="LENGTH",
-                                    update=updateOffsetImage)
-    cutter_length: FloatProperty(name="#Cutter length", description="#not supported#Cutter length", min=0.0, max=100.0,
-                                  default=0.025, precision=PRECISION, unit="LENGTH", update=updateOffsetImage)
-    cutter_flutes: IntProperty(name="Cutter flutes", description="Cutter flutes", min=1, max=20, default=2,
-                                update=updateChipload)
-    cutter_tip_angle: FloatProperty(name="Cutter v-carve angle", description="Cutter v-carve angle", min=0.0,
-                                     max=180.0, default=60.0, precision=PRECISION, update=updateOffsetImage)
-    cutter_name: StringProperty(name="Tool Name", default="tool", update=updateOffsetImage)
-    cutter_description: StringProperty(name="Tool Description", default="", update=updateOffsetImage)
+    # cutter_id: IntProperty(name="Tool number", description="For machines which support tool change based on tool id",
+    #                        min=0, max=10000, default=1, update=updateRest)
+    # cutter_diameter: FloatProperty(name="Cutter diameter", description="Cutter diameter = 2x cutter radius",
+    #                                 min=0.000001, max=10, default=0.003, precision=PRECISION, unit="LENGTH",
+    #                                 update=updateOffsetImage)
+    # cutter_length: FloatProperty(name="#Cutter length", description="#not supported#Cutter length", min=0.0, max=100.0,
+    #                               default=0.025, precision=PRECISION, unit="LENGTH", update=updateOffsetImage)
+    # cutter_flutes: IntProperty(name="Cutter flutes", description="Cutter flutes", min=1, max=20, default=2,
+    #                             update=updateChipload)
+    # cutter_tip_angle: FloatProperty(name="Cutter v-carve angle", description="Cutter v-carve angle", min=0.0,
+    #                                  max=180.0, default=60.0, precision=PRECISION, update=updateOffsetImage)
+    # cutter_name: StringProperty(name="Tool Name", default="tool", update=updateOffsetImage)
+    # cutter_description: StringProperty(name="Tool Description", default="", update=updateOffsetImage)
 
     # steps
     dist_between_paths: bpy.props.FloatProperty(name="Distance between toolpaths", default=0.001, min=0.00001, max=32,
@@ -882,6 +949,8 @@ class camChain(bpy.types.PropertyGroup):  # chain is just a set of operations wh
     operations: bpy.props.CollectionProperty(type=opReference)  # this is to hold just operation names.
 
 
+
+
 @bpy.app.handlers.persistent
 def check_operations_on_load(context):
     """checks any broken computations on load and reset them."""
@@ -912,17 +981,20 @@ class AddPresetCamCutter(bl_operators.presets.AddPresetBase, Operator):
     preset_menu = "CAM_CUTTER_MT_presets"
 
     preset_defines = [
-        "d = bpy.context.scene.cam_operations[bpy.context.scene.cam_active_operation]"
+        "d = bpy.context.scene.cam_cutting_tools[bpy.context.scene.cam_active_cutting_tool]"
     ]
 
+    #Commented out things that should be on an individual basis anyway
     preset_values = [
-        "d.cutter_id",
+        #"d.cutter_id",
         "d.cutter_type",
         "d.cutter_diameter",
         "d.cutter_length",
         "d.cutter_flutes",
         "d.cutter_tip_angle",
-        "d.cutter_description",
+        #"d.cutter_description",
+        #"d.cutter_name",
+        "d.cutter_total_length",
     ]
 
     preset_subdir = "cam_cutters"
@@ -1027,27 +1099,31 @@ def get_panels():  # convenience function for bot register and unregister functi
         ui.CAM_UL_operations,
         # ui.CAM_UL_orientations,
         ui.CAM_UL_chains,
+        ui.CAM_UL_cutting_tools,
         camOperation,
         opReference,
         camChain,
         machineSettings,
         CamAddonPreferences,
 
+        ui.CAM_CUTTING_TOOLS_Panel,
         ui.CAM_CHAINS_Panel,
         ui.CAM_OPERATIONS_Panel,
         ui.CAM_INFO_Panel,
+        ui.CAM_CUTTER_Panel,
         ui.CAM_MATERIAL_Panel,
         ui.CAM_OPERATION_PROPERTIES_Panel,
         ui.CAM_OPTIMISATION_Panel,
         ui.CAM_AREA_Panel,
         ui.CAM_MOVEMENT_Panel,
         ui.CAM_FEEDRATE_Panel,
-        ui.CAM_CUTTER_Panel,
         ui.CAM_GCODE_Panel,
         ui.CAM_MACHINE_Panel,
         ui.CAM_PACK_Panel,
         ui.CAM_SLICE_Panel,
         ui.VIEW3D_PT_tools_curvetools,
+
+        
 
         ops.PathsBackground,
         ops.KillPathsBackground,
@@ -1099,6 +1175,11 @@ def get_panels():  # convenience function for bot register and unregister functi
         PackObjectsSettings,
         SliceObjectsSettings,
 
+        ops.CuttingToolAdd,
+        ops.CuttingToolCopy,
+        ops.CuttingToolRemove,
+        ops.CuttingToolMove,
+        CuttingToolDefinition,
     )
 
 
@@ -1218,27 +1299,32 @@ classes = [
     ui.CAM_UL_operations,
     # ui.CAM_UL_orientations,
     ui.CAM_UL_chains,
+    ui.CAM_UL_cutting_tools,
     camOperation,
     opReference,
     camChain,
     machineSettings,
     CamAddonPreferences,
 
+    ui.CAM_CUTTING_TOOLS_Panel,
     ui.CAM_CHAINS_Panel,
     ui.CAM_OPERATIONS_Panel,
     ui.CAM_INFO_Panel,
+    ui.CAM_CUTTER_Panel,
     ui.CAM_MATERIAL_Panel,
     ui.CAM_OPERATION_PROPERTIES_Panel,
     ui.CAM_OPTIMISATION_Panel,
     ui.CAM_AREA_Panel,
     ui.CAM_MOVEMENT_Panel,
     ui.CAM_FEEDRATE_Panel,
-    ui.CAM_CUTTER_Panel,
+    
     ui.CAM_GCODE_Panel,
     ui.CAM_MACHINE_Panel,
     ui.CAM_PACK_Panel,
     ui.CAM_SLICE_Panel,
     ui.VIEW3D_PT_tools_curvetools,
+
+    
 
     ops.PathsBackground,
     ops.KillPathsBackground,
@@ -1287,8 +1373,15 @@ classes = [
     BLENDERCAM_ENGINE,
     # CamBackgroundMonitor
     # pack module:
+    
     PackObjectsSettings,
     SliceObjectsSettings,
+
+    ops.CuttingToolAdd,
+    ops.CuttingToolCopy,
+    ops.CuttingToolRemove,
+    ops.CuttingToolMove,
+    CuttingToolDefinition, 
 ]
 
 
@@ -1315,6 +1408,13 @@ def register():
     s.cam_pack = bpy.props.PointerProperty(type=PackObjectsSettings)
 
     s.cam_slice = bpy.props.PointerProperty(type=SliceObjectsSettings)
+
+    s.cam_cutting_tools = bpy.props.CollectionProperty(type=CuttingToolDefinition)
+    s.cam_cutting_tools_items = []
+
+    s.cam_active_cutting_tool = bpy.props.IntProperty(name="CAM Active Cutting Tool", description="The selected cutting tool")
+
+
 
 
 def unregister():
