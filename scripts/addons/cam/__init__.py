@@ -518,7 +518,7 @@ class CuttingToolDefinition(bpy.types.PropertyGroup):
                                   default=0.025, precision=PRECISION, unit="LENGTH", update=updateToolsOffsetImage)
 
     cutter_total_length: FloatProperty(name="Total Tool Length", description="Used for tool change clearance  in some cases", min=0.0, max=100.0,
-                                  default=0.025, precision=PRECISION, unit="LENGTH", update=updateToolsRest)
+                                  default=0.050, precision=PRECISION, unit="LENGTH", update=updateToolsRest)
 
     cutter_collet_tip_distance: FloatProperty(name="Holder-to-tip distance", description="The parallel distance from the face of the tool holder to the tip of the tool when fully inserted. Used for automatic z adjustment in some cases. ", min=0.0, max=100.0,
                                   default=0.025, precision=PRECISION, unit="LENGTH", update=updateToolsRest)
