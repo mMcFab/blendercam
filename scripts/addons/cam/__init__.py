@@ -411,13 +411,14 @@ def getStrategyList(scene, context):
                       ('PROJECTED_CURVE', 'Projected curve - EXPERIMENTAL', 'project 1 curve towards other curve')])
     return items
 
+
 def getCuttingToolList(scene, context):
     s = bpy.context.scene
     items = []
     #print(s.cam_cutting_tools)
     for tool in s.cam_cutting_tools:
         #print(dir(tool))
-        items.extend([(str(tool.cutter_static_id), tool.cutter_name, tool.cutter_description)])
+        items.extend([(str(tool.cutter_static_id), tool.cutter_name, tool.cutter_description, tool.cutter_static_id)])
         
     #for i in range(0, len(s.cam_cutting_tools)):
         #tool = s.cam_cutting_tools[i]

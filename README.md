@@ -11,7 +11,7 @@ I haven't tested this with OpenCAMLib yet, since I don't have the disk space fre
 
 Know Important Issues:
 
-* Re-ordering tools in the tool shelf will cause operations to change to whatever was in the original position of the tool they are using
+* 
 
 # Below is the original ReadMe, which I have kept since it has a bunch of useful links
 
