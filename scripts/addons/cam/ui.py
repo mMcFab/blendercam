@@ -100,13 +100,13 @@ class CAM_CUTTER_Panel(CAMButtonsPanel, bpy.types.Panel):
 
 class CAM_MACHINE_Panel(CAMButtonsPanel, bpy.types.Panel):
     """CAM machine panel"""
-    bl_label = " "
+    bl_label = "CAM Machine"
     bl_idname = "WORLD_PT_CAM_MACHINE"
 
     COMPAT_ENGINES = {'BLENDERCAM_RENDER'}
 
-    def draw_header(self, context):
-        self.layout.menu("CAM_MACHINE_MT_presets", text="CAM Machine")
+    #def draw_header(self, context):
+    #    self.layout.menu("CAM_MACHINE_MT_presets", text="CAM Machine")
 
     def draw(self, context):
         layout = self.layout
@@ -167,6 +167,7 @@ class CAM_MATERIAL_Panel(CAMButtonsPanel, bpy.types.Panel):
     bl_idname = "WORLD_PT_CAM_MATERIAL"
 
     COMPAT_ENGINES = {'BLENDERCAM_RENDER'}
+    bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
@@ -257,6 +258,7 @@ class CAM_CHAINS_Panel(CAMButtonsPanel, bpy.types.Panel):
     bl_idname = "WORLD_PT_CAM_CHAINS"
 
     COMPAT_ENGINES = {'BLENDERCAM_RENDER'}
+    bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
@@ -489,6 +491,7 @@ class CAM_OPERATION_PROPERTIES_Panel(CAMButtonsPanel, bpy.types.Panel):
     bl_idname = "WORLD_PT_CAM_OPERATION"
 
     COMPAT_ENGINES = {'BLENDERCAM_RENDER'}
+    bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
@@ -622,6 +625,7 @@ class CAM_MOVEMENT_Panel(CAMButtonsPanel, bpy.types.Panel):
     bl_idname = "WORLD_PT_CAM_MOVEMENT"
 
     COMPAT_ENGINES = {'BLENDERCAM_RENDER'}
+    bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
@@ -680,6 +684,7 @@ class CAM_FEEDRATE_Panel(CAMButtonsPanel, bpy.types.Panel):
     bl_idname = "WORLD_PT_CAM_FEEDRATE"
 
     COMPAT_ENGINES = {'BLENDERCAM_RENDER'}
+    bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
@@ -703,6 +708,7 @@ class CAM_OPTIMISATION_Panel(CAMButtonsPanel, bpy.types.Panel):
     bl_idname = "WORLD_PT_CAM_OPTIMISATION"
 
     COMPAT_ENGINES = {'BLENDERCAM_RENDER'}
+    bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
@@ -745,6 +751,7 @@ class CAM_AREA_Panel(CAMButtonsPanel, bpy.types.Panel):
     bl_idname = "WORLD_PT_CAM_OPERATION_AREA"
 
     COMPAT_ENGINES = {'BLENDERCAM_RENDER'}
+    bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
@@ -802,6 +809,7 @@ class CAM_GCODE_Panel(CAMButtonsPanel, bpy.types.Panel):
     bl_idname = "WORLD_PT_CAM_GCODE"
 
     COMPAT_ENGINES = {'BLENDERCAM_RENDER'}
+    bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
@@ -831,6 +839,7 @@ class CAM_PACK_Panel(CAMButtonsPanel, bpy.types.Panel):
     bl_idname = "WORLD_PT_CAM_PACK"
 
     COMPAT_ENGINES = {'BLENDERCAM_RENDER'}
+    bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
@@ -853,6 +862,7 @@ class CAM_SLICE_Panel(CAMButtonsPanel, bpy.types.Panel):
     bl_idname = "WORLD_PT_CAM_SLICE"
 
     COMPAT_ENGINES = {'BLENDERCAM_RENDER'}
+    bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
         layout = self.layout
@@ -873,6 +883,7 @@ class VIEW3D_PT_tools_curvetools(bpy.types.Panel):
 
     # bl_category = "Blender CAM"
     # bl_options = {'DEFAULT_CLOSED'}
+    
 
     def draw(self, context):
         layout = self.layout
