@@ -120,9 +120,9 @@ class Creator(iso.Creator):
 					#print(self.shift_z);
 					add_to_shift_z += 1000 * (self.tool_defn_params[id]['collet_tip_distance'] - self.tool_defn_params[self.t]['collet_tip_distance'])
 					#print(self.shift_z);
-					resting_z += 1000 * max(self.tool_defn_params[id]['total_length'], self.tool_defn_params[self.t]['total_length'])
+					resting_z += 1000 * max(self.tool_defn_params[id]['total_length'] - self.tool_defn_params[id]['collet_tip_distance'], self.tool_defn_params[self.t]['total_length'] - self.tool_defn_params[self.t]['collet_tip_distance'])
 				else:
-					resting_z += 1000 * self.tool_defn_params[id]['total_length']
+					resting_z += 1000 * (self.tool_defn_params[id]['total_length'] - self.tool_defn_params[id]['collet_tip_distance'])
 					
 			
 			
