@@ -866,9 +866,22 @@ def createSimulationObject(name, operations, i):
 
 	o = operations[0]
 
-	o_min_z = o.min.z
+	
+
+	min_x = o.min.x
+	max_x = o.max.x
+	min_y = o.min.y
+	max_y = o.max.y
+	min_z = o.min.z
+	max_z = o.max.z
+
 	for op in operations:
-		o_min_z = min(o_min_z, op.min.z)
+		min_x = min(min_x, op.min.x)
+		max_x = max(max_x, op.max.x)
+		min_y = min(min_y, op.min.y)
+		max_y = max(max_y, op.max.y)
+		min_z = min(min_z, op.min.z)
+		max_z = max(max_z, op.max.z)
 
 	if oname in bpy.data.objects:
 		ob = bpy.data.objects[oname]
@@ -890,12 +903,13 @@ def createSimulationObject(name, operations, i):
 		bpy.ops.object.modifier_add(type='DISPLACE')
 
 	#ob.location = ((o.max.x + o.min.x) / 2, (o.max.y + o.min.y) / 2, o.min.z)
-	ob.location = ((o.max.x + o.min.x) / 2, (o.max.y + o.min.y) / 2, o_min_z)
-	ob.scale.x = (o.max.x - o.min.x) / 2
-	ob.scale.y = (o.max.y - o.min.y) / 2
-	print(o.max.x, o.min.x)
-	print(o.max.y, o.min.y)
+	ob.location = ((max_x + min_x) / 2, (max_y + min_y) / 2, min_z)
+	ob.scale.x = (max_x - min_x) / 2
+	ob.scale.y = (max_y - min_y) / 2
+	
 	print('bounds')
+	print(max_x, min_x)
+	print(max_y, min_y)
 	disp = ob.modifiers[-1]
 	disp.direction = 'Z'
 	disp.texture_coords = 'LOCAL'
