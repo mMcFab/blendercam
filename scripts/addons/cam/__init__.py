@@ -277,7 +277,7 @@ def operationValid(self, context):
 
     s = bpy.context.scene
 
-    if len(s.cam_cutting_tools) < 1 or o.cutting_tool == None:
+    if len(s.cam_cutting_tools) < 1 or o.cutting_tool == None or o.getOpCuttingTool() is None:
         o.valid = False
         o.warnings = "Operation has no cutting tool selected"
 
@@ -433,6 +433,7 @@ def updateToolChange(self, context):
     updateOffsetImage(self, context)
     updateZbufferImage(self, context)
     updateRest(self, context)
+    updateOperationValid(self, context)
     #print("update all")
 
 def updateToolsChipload(self, context):
@@ -1033,7 +1034,8 @@ class camOperation(bpy.types.PropertyGroup):
         #print(self.cutting_tool)
         #print(len(s.cam_cutting_tools))
 
-        if ((len(s.cam_cutting_tools) > 0) and (self.cutting_tool is not None)):
+
+        if ((len(s.cam_cutting_tools) > 0) and (self.cutting_tool is not None) and self.cutting_tool != ''):
             
             for tool in s.cam_cutting_tools:
                 #print("Tool static ID")
@@ -1045,6 +1047,9 @@ class camOperation(bpy.types.PropertyGroup):
             return None
         
         return None
+
+    def extUpdateOperationValid(self):
+        updateOperationValid(self, bpy.context)
 
 
 

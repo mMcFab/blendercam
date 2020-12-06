@@ -35,6 +35,7 @@ from mathutils import *
 import math
 
 
+
 class threadCom:  # object passed to threads to read background process stdout info
     def __init__(self, o, proc):
         self.opname = o.name
@@ -1398,6 +1399,11 @@ class CuttingToolRemove(bpy.types.Operator):
         bpy.context.scene.cam_cutting_tools.remove(bpy.context.scene.cam_active_cutting_tool)
         if bpy.context.scene.cam_active_cutting_tool > 0:
             bpy.context.scene.cam_active_cutting_tool -= 1
+
+        for op in bpy.context.scene.cam_operations:
+            #__init__.updateOperationValid(op, context)
+            op.extUpdateOperationValid()
+        
 
         return {'FINISHED'}
 
