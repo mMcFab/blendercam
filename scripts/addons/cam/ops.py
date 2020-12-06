@@ -1319,7 +1319,7 @@ class CuttingToolAdd(bpy.types.Operator):
 
         for tool in s.cam_cutting_tools:
             max_existing_id = max(max_existing_id, tool.cutter_id)
-            print(int(tool.cutter_static_id))
+            #print(int(tool.cutter_static_id))
             max_existing_static_id = max(max_existing_static_id, (tool.cutter_static_id))
 
         #new_static_id = 0
@@ -1332,7 +1332,7 @@ class CuttingToolAdd(bpy.types.Operator):
         o.cutter_name = 'Tool_' + str(o.cutter_id)
         o.cutter_static_id = (max_existing_static_id + 1)
         
-        print("New static ID ", o.cutter_static_id);
+        #print("New static ID ", o.cutter_static_id)
 
         #o.filename = o.name
 

@@ -275,13 +275,19 @@ def operationValid(self, context):
             o.valid = False
             o.warnings = invalidmsg
 
+    s = bpy.context.scene
+
+    if len(s.cam_cutting_tools) < 1 or o.cutting_tool == None:
+        o.valid = False
+        o.warnings = "Operation has no cutting tool selected"
+
         o.use_exact = False
     o.update_offsetimage_tag = True
     o.update_zbufferimage_tag = True
     print('validity ')
+    print(o.valid)
 
 
-# print(o.valid)
 
 def updateOperationValid(self, context):
     operationValid(self, context)
@@ -291,11 +297,11 @@ def updateOperationValid(self, context):
 # Update functions start here
 def updateChipload(self, context):
     """this is very simple computation of chip size, could be very much improved"""
-    print('update chipload ')
-    o = self;
+    #print('update chipload ')
+    o = self
     # self.changed=True
     # Old chipload
-    o.chipload = ((o.feedrate / (o.spindle_rpm * o.cutter_flutes)))
+    o.chipload = ((o.feedrate / (o.spindle_rpm * o.getOpCuttingTool().cutter_flutes)))
     ###New chipload with chip thining compensation.
     # I have tried to combine these 2 formulas to compinsate for the phenomenon of chip thinning when cutting at less than 50% cutter engagement with cylindrical end mills.
     # formula 1 Nominal Chipload is " feedrate mm/minute = spindle rpm x chipload x cutter diameter mm x cutter_flutes "
@@ -304,6 +310,7 @@ def updateChipload(self, context):
     # I am sure there is a better way to do this. I dont get consistent result and I am not sure if there is something wrong with the units going into the formula, my math or my lack of underestanding of python or programming in genereal. Hopefuly some one can have a look at this and with any luck we will be one tiny step on the way to a slightly better chipload calculating function.
 
     # self.chipload = ((0.5*(o.cutter_diameter/o.dist_between_paths))/(math.sqrt((o.feedrate*1000)/(o.spindle_rpm*o.cutter_diameter*o.cutter_flutes)*(o.cutter_diameter/o.dist_between_paths)-1)))
+    #print("updated chipload")
     print(o.chipload)
 
 
@@ -340,7 +347,7 @@ def updateStrategy(o, context):
 
 
 def updateCutout(o, context):
-    pass;
+    pass
 
 
 # if o.outlines_count>1:
@@ -369,9 +376,12 @@ def updateBridges(o, context):
 # utils.setupBridges(o)
 
 def updateRest(o, context):
-    # print('update rest ')
+    #print('update rest ')
     # if o.use_layers:
     # o.parallel_step_back = False
+
+    #print(o.getOpCuttingTool())
+    #print(dir(o.getOpCuttingTool()))
     o.changed = True
 
 
@@ -405,7 +415,7 @@ def getCuttingToolList(scene, context):
     s = bpy.context.scene
     items = []
     #print(s.cam_cutting_tools)
-    for tool in s.cam_cutting_tools: 
+    for tool in s.cam_cutting_tools:
         #print(dir(tool))
         items.extend([(str(tool.cutter_static_id), tool.cutter_name, tool.cutter_description)])
         
@@ -416,9 +426,71 @@ def getCuttingToolList(scene, context):
     #    items.extend([(tool, tool.cutter_name, tool.cutter_description)])
     return items
 
+#Do all the updates a tool edit would normally change
+def updateToolChange(self, context):
+    updateChipload(self, context)
+    updateOffsetImage(self, context)
+    updateZbufferImage(self, context)
+    updateRest(self, context)
+    #print("update all")
+
+def updateToolsChipload(self, context):
+    s = bpy.context.scene
+    for op in s.cam_operations:
+        if(int(op.cutting_tool) == self.cutter_static_id):
+            #print("Updateing parent op")
+            updateChipload(op, context)
+
+
+def updateToolsOffsetImage(self, context):
+    """refresh offset image tag for rerendering"""
+    s = bpy.context.scene
+    for op in s.cam_operations:
+        if(int(op.cutting_tool) == self.cutter_static_id):
+            #print("Updateing parent op")
+            updateOffsetImage(op, context)
+
+def updateToolsZbufferImage(self, context):
+    """changes tags so offset and zbuffer images get updated on calculation time."""
+    # print('updatezbuf')
+    # print(self,context)
+    s = bpy.context.scene
+    for op in s.cam_operations:
+        if(int(op.cutting_tool) == self.cutter_static_id):
+            #print("Updateing parent op")
+            updateZbufferImage(op, context)
+    
+
+
+
+def updateToolsRest(o, context):
+    s = bpy.context.scene
+    for op in s.cam_operations:
+        if(int(op.cutting_tool) == o.cutter_static_id):
+            #print("Updateing parent op")
+            updateRest(op, context)
+
+    #print('update rest ')
+    # if o.use_layers:
+    # o.parallel_step_back = False
+
+    #print(o.getOpCuttingTool())
+    #print(dir(o.getOpCuttingTool()))
+    
+
+
+
 class CuttingToolDefinition(bpy.types.PropertyGroup):
-    cutter_name: bpy.props.StringProperty(name="Tool Name", default="Tool", update=updateRest)
-    cutter_description: StringProperty(name="Tool Description", default="", update=updateRest)
+    #def __init__(self):
+    #self.cutter_static_id = 0
+
+    #updateRest
+    #updateZbufferimage
+    #updateoffsetimage
+    #updatechipload
+
+    cutter_name: bpy.props.StringProperty(name="Tool Name", default="Tool", update=updateToolsRest)
+    cutter_description: StringProperty(name="Tool Description", default="", update=updateToolsRest)
     
     cutter_type: EnumProperty(name='Type',
                               items=(
@@ -428,34 +500,35 @@ class CuttingToolDefinition(bpy.types.PropertyGroup):
                                   ('BALL', 'Sphere', 'Sphere cutter'),
                                   ('CUSTOM', 'Custom-EXPERIMENTAL', 'modelled cutter - not well tested yet.')),
                               description='Type of cutter used',
-                              default='END', update=updateZbufferImage)
+                              default='END', update=updateToolsZbufferImage)
     cutter_object_name: bpy.props.StringProperty(name='Cutter object',
                                                   description='object used as custom cutter for this operation',
-                                                  update=updateZbufferImage)
+                                                  update=updateToolsZbufferImage)
 
     cutter_id: IntProperty(name="Tool number", description="For machines which support tool change based on tool id",
-                           min=0, max=10000, default=1, update=updateRest)
+                           min=0, max=10000, default=1, update=updateToolsRest)
 
     cutter_diameter: FloatProperty(name="Cutter diameter", description="Cutter diameter = 2x cutter radius",
                                     min=0.000001, max=10, default=0.003, precision=PRECISION, unit="LENGTH",
-                                    update=updateOffsetImage)
+                                    update=updateToolsOffsetImage)
 
     cutter_length: FloatProperty(name="#Cutting edge height", description="#not supported#Cutter length", min=0.0, max=100.0,
-                                  default=0.025, precision=PRECISION, unit="LENGTH", update=updateOffsetImage)
+                                  default=0.025, precision=PRECISION, unit="LENGTH", update=updateToolsOffsetImage)
 
     cutter_total_length: FloatProperty(name="Total Tool Length", description="Used for tool change clearance and automatic z adjustment in some cases", min=0.0, max=100.0,
-                                  default=0.025, precision=PRECISION, unit="LENGTH", update=updateOffsetImage)
+                                  default=0.025, precision=PRECISION, unit="LENGTH", update=updateToolsRest)
 
     #cutter_shank_length: FloatProperty(name="Tool Shank Length", description="Used for automatic z-adjustment on tool change", min=0.0, max=100.0,
     #                              default=0.025, precision=PRECISION, unit="LENGTH", update=updateOffsetImage)
 
 
     cutter_flutes: IntProperty(name="Cutter flutes", description="Cutter flutes", min=1, max=20, default=2,
-                                update=updateChipload)
+                                update=updateToolsChipload)
     cutter_tip_angle: FloatProperty(name="Cutter v-carve angle", description="Cutter v-carve angle", min=0.0,
-                                     max=180.0, default=60.0, precision=PRECISION, update=updateOffsetImage)
+                                     max=180.0, default=60.0, precision=PRECISION, update=updateToolsOffsetImage)
 
-    #Just so I can use it as an enum (and maintain the same cutter if parameters are tweaked)
+    # Just so I can use it as an enum (and maintain the same cutter if parameters are tweaked)
+    # Needs to be this way or it doesn't get remembered properly
     cutter_static_id: IntProperty(name="Static ID", description="Internal Static ID", min=0, max=1024, default=0)
 
     #def createDict():
@@ -508,9 +581,11 @@ class camOperation(bpy.types.PropertyGroup):
     #                                               update=updateZbufferImage)
     
     #Target tool definition
+    #needs an update callback. 
     cutting_tool: EnumProperty(name='Cutting Tool',
                                 items=getCuttingToolList,
-                                description='Cutting tool used for this operation')
+                                description='Cutting tool used for this operation',
+                                update=updateToolChange)
 
 
     machine_axes: EnumProperty(name='Number of axes',
@@ -931,6 +1006,26 @@ class camOperation(bpy.types.PropertyGroup):
     computing: bpy.props.BoolProperty(name="Computing right now", description="", default=False)
     pid: bpy.props.IntProperty(name="process id", description="Background process id", default=-1)
     outtext: bpy.props.StringProperty(name='outtext', description='outtext', default='')
+
+    def getOpCuttingTool(self):
+        s = bpy.context.scene
+        #print("Get tool start")
+        #print(self.cutting_tool)
+        #print(len(s.cam_cutting_tools))
+
+        if ((len(s.cam_cutting_tools) > 0) and (self.cutting_tool is not None)):
+            
+            for tool in s.cam_cutting_tools:
+                #print("Tool static ID")
+                #print(tool.cutter_static_id)
+                #print("My Cutting Tool")
+                #print(self.cutting_tool)
+                if(int(tool.cutter_static_id) == int(self.cutting_tool)):
+                    return tool
+            return None
+        
+        return None
+
 
 
 class opReference(bpy.types.PropertyGroup):  # this type is defined just to hold reference to operations for chains
