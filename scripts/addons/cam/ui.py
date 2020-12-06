@@ -539,18 +539,18 @@ class CAM_OPERATION_PROPERTIES_Panel(CAMButtonsPanel, bpy.types.Panel):
 
                 if ao.strategy == 'CUTOUT':
                     layout.prop(ao, 'cut_type')
-                    # layout.prop(ao,'dist_between_paths')
+                    # layout.prop(ao,'tool_stepover')
                     if use_experimental:
                         layout.prop(ao, 'outlines_count')
                         if ao.outlines_count > 1:
-                            layout.prop(ao, 'dist_between_paths')
+                            layout.prop(ao, 'tool_stepover')
                             layout.prop(ao, 'movement_insideout')
                     layout.prop(ao, 'dont_merge')
                 elif ao.strategy == 'WATERLINE':
                     layout.prop(ao, 'slice_detail')
                     layout.prop(ao, 'waterline_fill')
                     if ao.waterline_fill:
-                        layout.prop(ao, 'dist_between_paths')
+                        layout.prop(ao, 'tool_stepover')
                         layout.prop(ao, 'waterline_project')
                     layout.prop(ao, 'inverse')
                 elif ao.strategy == 'CARVE':
@@ -568,15 +568,15 @@ class CAM_OPERATION_PROPERTIES_Panel(CAMButtonsPanel, bpy.types.Panel):
                     layout.prop(ao, 'crazy_threshold2')
                     layout.prop(ao, 'crazy_threshold3')
                     layout.prop(ao, 'crazy_threshold4')
-                    layout.prop(ao, 'dist_between_paths')
+                    layout.prop(ao, 'tool_stepover')
                     layout.prop(ao, 'dist_along_paths')
                 elif ao.strategy == 'DRILL':
                     layout.prop(ao, 'drill_type')
                 elif ao.strategy == 'POCKET':
                     layout.prop(ao, 'pocket_option')
-                    layout.prop(ao, 'dist_between_paths')
+                    layout.prop(ao, 'tool_stepover')
                 else:
-                    layout.prop(ao, 'dist_between_paths')
+                    layout.prop(ao, 'tool_stepover')
                     layout.prop(ao, 'dist_along_paths')
                     if ao.strategy == 'PARALLEL' or ao.strategy == 'CROSS':
                         layout.prop(ao, 'parallel_angle')

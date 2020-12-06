@@ -37,7 +37,10 @@ def getPathPatternParallel(o,angle):
 	#minx,miny,minz,maxx,maxy,maxz=o.min.x,o.min.y,o.min.z,o.max.x,o.max.y,o.max.z
 	#ob=o.object
 	zlevel=1
-	pathd=o.dist_between_paths
+
+	dist_b_paths = (o.tool_stepover * o.getOpCuttingTool().cutter_diameter)/100.0
+	pathd=dist_b_paths
+
 	pathstep=o.dist_along_paths
 	pathchunks=[]
 	#progress(o.max.x,stepx)
@@ -164,6 +167,7 @@ def getPathPattern(operation):
 	o=operation
 
 	cutter_props = o.getOpCuttingTool()
+	dist_b_paths = (o.tool_stepover * cutter_props.cutter_diameter)/100.0
 
 	t=time.time()
 	progress('building path pattern')
@@ -181,7 +185,8 @@ def getPathPattern(operation):
 
 	elif o.strategy=='BLOCK':
 
-		pathd=o.dist_between_paths
+		
+		pathd=dist_b_paths
 		pathstep=o.dist_along_paths
 		maxxp=maxx
 		maxyp=maxy
@@ -249,7 +254,7 @@ def getPathPattern(operation):
 
 	elif o.strategy=='SPIRAL':
 		chunk=camPathChunk([])
-		pathd=o.dist_between_paths
+		pathd=dist_b_paths
 		pathstep=o.dist_along_paths
 		midx=(o.max.x+o.min.x)/2
 		midy=(o.max.y+o.min.y)/2
@@ -291,7 +296,7 @@ def getPathPattern(operation):
 
 	elif o.strategy=='CIRCLES':
 
-		pathd=o.dist_between_paths
+		pathd=dist_b_paths
 		pathstep=o.dist_along_paths
 		midx=(o.max.x+o.min.x)/2
 		midy=(o.max.y+o.min.y)/2
@@ -365,7 +370,7 @@ def getPathPattern(operation):
 		pathchunks=[]
 		chunks=[]
 		for p in polys:
-			p=p.buffer(-o.dist_between_paths/10,o.circle_detail)#first, move a bit inside, because otherwise the border samples go crazy very often changin between hit/non hit and making too many jumps in the path.
+			p=p.buffer(-dist_b_paths/10,o.circle_detail)#first, move a bit inside, because otherwise the border samples go crazy very often changin between hit/non hit and making too many jumps in the path.
 			chunks.extend(shapelyToChunks(p,0))
 
 		pathchunks.extend(chunks)
@@ -376,13 +381,13 @@ def getPathPattern(operation):
 		#   if len(ch.points)>2:
 		#	 polys.extend()
 
-		approxn=(min(maxx-minx,maxy-miny)/o.dist_between_paths)/2
+		approxn=(min(maxx-minx,maxy-miny)/dist_b_paths)/2
 		i=0
 
 		for porig in polys:
 			p=porig
 			while not p.is_empty:#:p.nPoints()>0:
-				p=p.buffer(-o.dist_between_paths,o.circle_detail)
+				p=p.buffer(-dist_b_paths,o.circle_detail)
 				if not p.is_empty:
 					nchunks=shapelyToChunks(p,zlevel)
 
@@ -399,11 +404,11 @@ def getPathPattern(operation):
 		if not(o.inverse):#dont do ambient for inverse milling
 			lastchunks=firstchunks
 			for p in polys:
-				d=o.dist_between_paths
-				steps=o.ambient_radius/o.dist_between_paths
+				d=dist_b_paths
+				steps=o.ambient_radius/dist_b_paths
 				for a in range(0,int(steps)):
 					dist=d
-					if a==int(cutter_props.cutter_diameter/2/o.dist_between_paths):
+					if a==int(cutter_props.cutter_diameter/2/dist_b_paths):
 						if o.use_exact:
 							dist+=o.pixsize*0.85# this is here only because silhouette is still done with zbuffer method, even if we use bullet collisions.
 						else:
@@ -474,7 +479,7 @@ def getPathPattern4axis(operation):
 	#generalized length of the operation
 	maxl=o.max[a1]
 	minl=o.min[a1]
-	steps=(maxl-minl)/o.dist_between_paths
+	steps=(maxl-minl)/dist_b_paths
 
 	#set starting positions for cutter e.t.c.
 	cutterstart=Vector((0,0,0))
@@ -487,7 +492,7 @@ def getPathPattern4axis(operation):
 		for a in range(0,floor(steps)+1):
 			chunk=camPathChunk([])
 
-			cutterstart[a1]=o.min[a1]+a*o.dist_between_paths
+			cutterstart[a1]=o.min[a1]+a*dist_b_paths
 			cutterend[a1]=cutterstart[a1]
 
 			cutterstart[a2]=0#radius
@@ -516,7 +521,7 @@ def getPathPattern4axis(operation):
 			pathchunks.append(chunk)
 
 	if o.strategy4axis=='PARALLEL':
-		circlesteps=(mradius*pi*2)/o.dist_between_paths
+		circlesteps=(mradius*pi*2)/dist_b_paths
 		steps=(maxl-minl)/o.dist_along_paths
 
 		anglestep = 2*pi/circlesteps
@@ -561,13 +566,13 @@ def getPathPattern4axis(operation):
 	if o.strategy4axis=='HELIX':
 		print('helix')
 
-		a1step=o.dist_between_paths / circlesteps
+		a1step=dist_b_paths / circlesteps
 
 		chunk=camPathChunk([])#only one chunk, init here
 
 		for a in range(0,floor(steps)+1):
 
-			cutterstart[a1]=o.min[a1]+a*o.dist_between_paths
+			cutterstart[a1]=o.min[a1]+a*dist_b_paths
 			cutterend[a1]=cutterstart[a1]
 			cutterstart[a2]=0
 			cutterstart[a3]=radius

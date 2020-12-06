@@ -622,8 +622,10 @@ def parentChildPoly(parents, children, o):
 def parentChildDist(parents, children, o, distance=None):
     # parenting based on x,y distance between chunks
     # hierarchy works like this: - children get milled first.
+    dist_b_paths = (o.tool_stepover * o.getOpCuttingTool().cutter_diameter)/100.0
+
     if distance == None:
-        dlim = o.dist_between_paths * 2
+        dlim = dist_b_paths * 2
         if (o.strategy == 'PARALLEL' or o.strategy == 'CROSS') and o.parallel_step_back:
             dlim = dlim * 2
     else:
@@ -670,7 +672,7 @@ def parentChildDist(parents, children, o, distance=None):
 # 	#parenting based on distance between chunks
 # 	#hierarchy works like this: - children get milled first.
 # 	if distance==None:
-# 		dlim=o.dist_between_paths*2
+# 		dlim=dist_b_paths*2
 # 		if (o.strategy=='PARALLEL' or o.strategy=='CROSS') and o.parallel_step_back:
 # 			dlim=dlim*2
 # 	else:

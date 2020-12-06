@@ -699,8 +699,13 @@ class camOperation(bpy.types.PropertyGroup):
     # cutter_description: StringProperty(name="Tool Description", default="", update=updateOffsetImage)
 
     # steps
-    dist_between_paths: bpy.props.FloatProperty(name="Distance between toolpaths", default=0.001, min=0.00001, max=32,
-                                                 precision=PRECISION, unit="LENGTH", update=updateRest)
+    tool_stepover: bpy.props.FloatProperty(name="Tool Stepover", default=50, min=1, max=100,
+                                                 precision=1, subtype="PERCENTAGE", unit="NONE", update=updateRest, description="Percentage of the tool diameter to have between each path")
+    
+    #dist_between_paths: bpy.props.FloatProperty(name="Distance between toolpaths", default=0.001, min=0.00001, max=32,
+    #                                             precision=PRECISION, unit="LENGTH", update=updateRest)
+
+
     dist_along_paths: bpy.props.FloatProperty(name="Distance along toolpaths", default=0.0002, min=0.00001, max=32,
                                                precision=PRECISION, unit="LENGTH", update=updateRest)
     parallel_angle: bpy.props.FloatProperty(name="Angle of paths", default=0, min=-360, max=360, precision=0,
@@ -1150,7 +1155,7 @@ class AddPresetCamOperation(bl_operators.presets.AddPresetBase, Operator):
                      'o.spindle_rpm', 'o.ambient_behaviour', 'o.source_image_scale_z',
                      'o.source_image_size_x', 'o.curve_object', 'o.curve_object1',
                      'o.ambient_radius', 'o.simulation_detail', 'o.update_offsetimage_tag',
-                     'o.dist_between_paths', 'o.max', 'o.min', 'o.pixsize', 'o.slice_detail', 'o.parallel_step_back',
+                     'o.tool_stepover', 'o.max', 'o.min', 'o.pixsize', 'o.slice_detail', 'o.parallel_step_back',
                      'o.drill_type', 'o.source_image_name', 'o.dont_merge', 'o.update_silhouete_tag',
                      'o.material_origin', 'o.inverse', 'o.waterline_fill', 'o.source_image_offset', 'o.circle_detail',
                      'o.strategy', 'o.update_zbufferimage_tag', 'o.stepdown', 'o.feedrate', 

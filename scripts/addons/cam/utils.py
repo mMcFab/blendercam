@@ -966,6 +966,8 @@ def chunksToMesh(chunks, o):
 	m = s.cam_machine
 	verts = []
 
+	dist_b_paths = (o.tool_stepover * o.getOpCuttingTool().cutter_diameter)/100.0
+
 	free_movement_height = o.free_movement_height  # o.max.z +
 
 
@@ -1039,8 +1041,8 @@ def chunksToMesh(chunks, o):
 				first = Vector(chunks[chi + 1].points[0])
 				vect = first - last
 				if (o.machine_axes == '3' and (
-						o.strategy == 'PARALLEL' or o.strategy == 'CROSS') and vect.z == 0 and vect.length < o.dist_between_paths * 2.5) or (
-						o.machine_axes == '4' and vect.length < o.dist_between_paths * 2.5):  # case of neighbouring paths
+						o.strategy == 'PARALLEL' or o.strategy == 'CROSS') and vect.z == 0 and vect.length < dist_b_paths * 2.5) or (
+						o.machine_axes == '4' and vect.length < dist_b_paths * 2.5):  # case of neighbouring paths
 					lift = False
 				if abs(vect.x) < e and abs(vect.y) < e:	 # case of stepdown by cutting.
 					lift = False
@@ -1549,11 +1551,13 @@ def connectChunksLow(chunks, o):
 	if not o.stay_low or (o.strategy == 'CARVE' and o.carve_depth > 0):
 		return chunks
 
+	dist_b_paths = (o.tool_stepover * o.getOpCuttingTool().cutter_diameter)/100.0
+
 	connectedchunks = []
 	chunks_to_resample = []	 # for OpenCAMLib sampling
-	mergedist = 3 * o.dist_between_paths
+	mergedist = 3 * dist_b_paths
 	if o.strategy == 'PENCIL':	# this is bigger for pencil path since it goes on the surface to clean up the rests, and can go to close points on the surface without fear of going deep into material.
-		mergedist = 10 * o.dist_between_paths
+		mergedist = 10 * dist_b_paths
 
 	if o.strategy == 'MEDIAL_AXIS':
 		mergedist = 1 * o.medial_axis_subdivision
@@ -2328,6 +2332,7 @@ def strategy_cutout(o):
 	print('operation: cutout')
 
 	cutter_props = o.getOpCuttingTool()
+	dist_b_paths = (o.tool_stepover * cutter_props.cutter_diameter)/100.0
 
 	offset = True
 	if o.cut_type == 'ONLINE' and o.onlycurves == True:	 # is separate to allow open curves :)
@@ -2355,7 +2360,7 @@ def strategy_cutout(o):
 			if o.outlines_count > 1:
 				for i in range(1, o.outlines_count):
 					chunksFromCurve.extend(shapelyToChunks(p, -1))
-					p = p.buffer(distance=o.dist_between_paths * offset, resolution=o.circle_detail)
+					p = p.buffer(distance=dist_b_paths * offset, resolution=o.circle_detail)
 
 		chunksFromCurve.extend(shapelyToChunks(p, -1))
 		if o.outlines_count > 1 and o.movement_insideout == 'OUTSIDEIN':
@@ -2524,9 +2529,11 @@ def strategy_pocket(o):
 	print('operation: pocket')
 
 	cutter_props = o.getOpCuttingTool()
+	dist_b_paths = (o.tool_stepover * cutter_props.cutter_diameter)/100.0
+	
 
 	p = getObjectOutline(cutter_props.cutter_diameter / 2, o, False)
-	approxn = (min(o.max.x - o.min.x, o.max.y - o.min.y) / o.dist_between_paths) / 2
+	approxn = (min(o.max.x - o.min.x, o.max.y - o.min.y) / dist_b_paths) / 2
 	i = 0
 	chunks = []
 	chunksFromCurve = []
@@ -2538,9 +2545,9 @@ def strategy_pocket(o):
 	while not p.is_empty:
 		nchunks = shapelyToChunks(p, o.min.z)
 
-		pnew = p.buffer(-o.dist_between_paths, o.circle_detail)
+		pnew = p.buffer(-dist_b_paths, o.circle_detail)
 
-		if o.dist_between_paths > cutter_props.cutter_diameter / 2.0:
+		if dist_b_paths > cutter_props.cutter_diameter / 2.0:
 			prest = prest.difference(pnew.boundary.buffer(cutter_props.cutter_diameter / 2, o.circle_detail))
 			if not (pnew.contains(prest)):
 				# shapelyToCurve('cesta',pnew,0)
@@ -2992,6 +2999,8 @@ def getPath3axis(context, operation):
 	o = operation
 	getBounds(o)
 
+	dist_b_paths = (o.tool_stepover * o.getOpCuttingTool().cutter_diameter)/100.0
+
 	if o.strategy == 'CUTOUT':
 		strategy_cutout(o)
 
@@ -3182,7 +3191,7 @@ def getPath3axis(context, operation):
 					# print(len(restpoly))
 					# polyToMesh('fillrest',restpoly,z)
 
-					restpoly = restpoly.buffer(-o.dist_between_paths, resolution=o.circle_detail)
+					restpoly = restpoly.buffer(-dist_b_paths, resolution=o.circle_detail)
 
 					fillz = z
 					i = 0
@@ -3199,7 +3208,7 @@ def getPath3axis(context, operation):
 						parentChildDist(lastchunks, nchunks, o)
 						lastchunks = nchunks
 						# slicechunks.extend(polyToChunks(restpoly,z))
-						restpoly = restpoly.buffer(-o.dist_between_paths, resolution=o.circle_detail)
+						restpoly = restpoly.buffer(-dist_b_paths, resolution=o.circle_detail)
 
 						i += 1
 				# print(i)
@@ -3221,7 +3230,7 @@ def getPath3axis(context, operation):
 					if (o.inverse and poly.is_empty and slicesfilled > 0):
 						restpoly = boundrect.difference(lastslice)
 
-					restpoly = restpoly.buffer(-o.dist_between_paths, resolution=o.circle_detail)
+					restpoly = restpoly.buffer(-dist_b_paths, resolution=o.circle_detail)
 
 					i = 0
 					while not restpoly.is_empty:  # 'GeometryCollection':#len(restpoly.boundary.coords)>0:
@@ -3233,7 +3242,7 @@ def getPath3axis(context, operation):
 						parentChildDist(lastchunks, nchunks, o)
 						lastchunks = nchunks
 						# slicechunks.extend(polyToChunks(restpoly,z))
-						restpoly = restpoly.buffer(-o.dist_between_paths, resolution=o.circle_detail)
+						restpoly = restpoly.buffer(-dist_b_paths, resolution=o.circle_detail)
 						i += 1
 
 				# """
@@ -3249,14 +3258,14 @@ def getPath3axis(context, operation):
 			#
 			#	  n=0
 			#	  while i.sum()>0 and n<10000:
-			#		  i=outlineImageBinary(o,o.dist_between_paths,i,False)
+			#		  i=outlineImageBinary(o,dist_b_paths,i,False)
 			#		  polys=imageToShapely(o,i)
 			#		  for poly in polys:
 			#			  chunks.extend(polyToChunks(poly,z))
 			#		  n+=1
 			#
 			#
-			#		  #restpoly=outlinePoly(restpoly,o.dist_between_paths,oo.circle_detail,o.optimize,o.optimize_threshold,,False)
+			#		  #restpoly=outlinePoly(restpoly,dist_b_pathss,oo.circle_detail,o.optimize,o.optimize_threshold,,False)
 			#		  #chunks.extend(polyToChunks(restpoly,z))
 			#
 			# lastislice=islice
@@ -3280,7 +3289,7 @@ def getPath3axis(context, operation):
 			# if len(chunks)>2:
 			#	  while chi<len(chunks)-2:
 			#		  d=dist2d((chunks[chi][-1][0],chunks[chi][-1][1]),(chunks[chi+1][0][0],chunks[chi+1][0][1]))
-			#		  if chunks[chi][0][2]>=chunks[chi+1][0][2] and d<o.dist_between_paths*2:
+			#		  if chunks[chi][0][2]>=chunks[chi+1][0][2] and d<dist_b_paths*2:
 			#			  chunks[chi].extend(chunks[chi+1])
 			#			  chunks.remove(chunks[chi+1])
 			#			  chi=chi-1
