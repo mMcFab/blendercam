@@ -7,6 +7,8 @@
 
 Unfortunately, old tool pre-sets can't just be imported directly into my modified system, so you'll need to manually copy the values over if you switch from the original repo. Operations should still copy across fine, you just need to specify the tool used
 
+I haven't tested this with OpenCAMLib yet, since I don't have the disk space free to install the tools to build it oops. I did update the code that seems to update it though
+
 # Below is the original ReadMe, which I have kept since it has a bunch of useful links
 
 
