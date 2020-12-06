@@ -162,6 +162,9 @@ def getPathPatternParallel(o,angle):
 
 def getPathPattern(operation):
 	o=operation
+
+	cutter_props = o.getOpCuttingTool()
+
 	t=time.time()
 	progress('building path pattern')
 	minx,miny,minz,maxx,maxy,maxz=o.min.x,o.min.y,o.min.z,o.max.x,o.max.y,o.max.z
@@ -400,7 +403,7 @@ def getPathPattern(operation):
 				steps=o.ambient_radius/o.dist_between_paths
 				for a in range(0,int(steps)):
 					dist=d
-					if a==int(o.cutter_diameter/2/o.dist_between_paths):
+					if a==int(cutter_props.cutter_diameter/2/o.dist_between_paths):
 						if o.use_exact:
 							dist+=o.pixsize*0.85# this is here only because silhouette is still done with zbuffer method, even if we use bullet collisions.
 						else:

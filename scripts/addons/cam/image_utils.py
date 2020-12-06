@@ -68,9 +68,12 @@ def getCircleBinary(r):
 
 # get cutters for the z-buffer image method
 def getCutterArray(operation, pixsize):
-    type = operation.cutter_type
+
+    cutter_props = operation.getOpCuttingTool()
+
+    type = cutter_props.cutter_type
     # print('generating cutter')
-    r = operation.cutter_diameter / 2 + operation.skin  # /operation.pixsize
+    r = cutter_props.cutter_diameter / 2 + operation.skin  # /operation.pixsize
     res = ceil((r * 2) / pixsize)
     # if res%2==0:#compensation for half-pixels issue, which wasn't an issue, so commented out
     # res+=1
@@ -99,7 +102,7 @@ def getCutterArray(operation, pixsize):
                     car.itemset((a, b), z)  # [a,b]=z
 
     elif type == 'VCARVE':
-        angle = operation.cutter_tip_angle
+        angle = cutter_props.cutter_tip_angle
         s = math.tan(math.pi * (90 - angle / 2) / 180)
         for a in range(0, res):
             v.x = (a + 0.5 - m) * ps
@@ -109,7 +112,7 @@ def getCutterArray(operation, pixsize):
                     z = (-v.length * s)
                     car.itemset((a, b), z)
     elif type == 'CUSTOM':
-        cutob = bpy.data.objects[operation.cutter_object_name]
+        cutob = bpy.data.objects[cutter_props.cutter_object_name]
         scale = ((cutob.dimensions.x / cutob.scale.x) / 2) / r  #
         # print(cutob.scale)
         vstart = Vector((0, 0, -10))
@@ -809,7 +812,9 @@ def crazyStrokeImage(
     pixsize = o.pixsize
     edges = []
 
-    r = int((o.cutter_diameter / 2.0) / o.pixsize)  # ceil((o.cutter_diameter/12)/o.pixsize)
+    cutter_props = o.getOpCuttingTool()
+
+    r = int((cutter_props.cutter_diameter / 2.0) / o.pixsize)  # ceil((o.cutter_diameter/12)/o.pixsize)
     d = 2 * r
     coef = 0.75
     # sx=o.max.x-o.min.x
@@ -1022,7 +1027,9 @@ def crazyStrokeImageBinary(o, ar,
     ar[:, -o.borderwidth:] = 0
     debug = numpytoimage(ar, 'start')
 
-    r = int((o.cutter_diameter / 2.0) / o.pixsize)  # ceil((o.cutter_diameter/12)/o.pixsize)
+    cutter_props = o.getOpCuttingTool()
+
+    r = int((cutter_props.cutter_diameter / 2.0) / o.pixsize)  # ceil((o.cutter_diameter/12)/o.pixsize)
     d = 2 * r
     coef = 0.75
     # sx=o.max.x-o.min.x

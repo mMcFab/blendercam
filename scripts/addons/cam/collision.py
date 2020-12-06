@@ -39,10 +39,12 @@ def getCutterBullet(o):
         c = s.objects['cutter']
         activate(c)
 
-    type = o.cutter_type
+    cutter_props = o.getOpCuttingTool()
+
+    type = cutter_props.cutter_type
     if type == 'END':
-        bpy.ops.mesh.primitive_cylinder_add(vertices=32, radius=BULLET_SCALE * o.cutter_diameter / 2,
-                                            depth=BULLET_SCALE * o.cutter_diameter, end_fill_type='NGON',
+        bpy.ops.mesh.primitive_cylinder_add(vertices=32, radius=BULLET_SCALE * cutter_props.cutter_diameter / 2,
+                                            depth=BULLET_SCALE * cutter_props.cutter_diameter, end_fill_type='NGON',
                                             align='WORLD', enter_editmode=False, location=CUTTER_OFFSET,
                                             rotation=(0, 0, 0))
         bpy.ops.rigidbody.object_add(type='ACTIVE')
@@ -51,14 +53,14 @@ def getCutterBullet(o):
     elif type == 'BALL' or type == 'BALLNOSE':
         if o.strategy != 'PROJECTED_CURVE' or type == 'BALL':  # only sphere, good for 3 axis and real ball cutters for undercuts and projected curve
 
-            bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=BULLET_SCALE * o.cutter_diameter / 2,
+            bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=BULLET_SCALE * cutter_props.cutter_diameter / 2,
                                                   align='WORLD', enter_editmode=False, location=CUTTER_OFFSET,
                                                   rotation=(0, 0, 0))
             bpy.ops.rigidbody.object_add(type='ACTIVE')
             cutter = bpy.context.active_object
             cutter.rigid_body.collision_shape = 'SPHERE'
         else:  # ballnose ending used mainly when projecting from sides. the actual collision shape is capsule in this case.
-            bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, raius=BULLET_SCALE * o.cutter_diameter / 2,
+            bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, raius=BULLET_SCALE * cutter_props.cutter_diameter / 2,
                                                   align='WORLD', enter_editmode=False, location=CUTTER_OFFSET,
                                                   rotation=(0, 0, 0))
             bpy.ops.rigidbody.object_add(type='ACTIVE')
@@ -69,22 +71,22 @@ def getCutterBullet(o):
 
     elif type == 'VCARVE':
 
-        angle = o.cutter_tip_angle
+        angle = cutter_props.cutter_tip_angle
         s = math.tan(math.pi * (90 - angle / 2) / 180) / 2
-        bpy.ops.mesh.primitive_cone_add(vertices=32, radius1=BULLET_SCALE * o.cutter_diameter / 2, radius2=0,
-                                        depth=BULLET_SCALE * o.cutter_diameter * s, end_fill_type='NGON',
+        bpy.ops.mesh.primitive_cone_add(vertices=32, radius1=BULLET_SCALE * cutter_props.cutter_diameter / 2, radius2=0,
+                                        depth=BULLET_SCALE * cutter_props.cutter_diameter * s, end_fill_type='NGON',
                                         align='WORLD', enter_editmode=False, location=CUTTER_OFFSET,
                                         rotation=(math.pi, 0, 0))
         bpy.ops.rigidbody.object_add(type='ACTIVE')
         cutter = bpy.context.active_object
         cutter.rigid_body.collision_shape = 'CONE'
     elif type == 'CUSTOM':
-        cutob = bpy.data.objects[o.cutter_object_name]
+        cutob = bpy.data.objects[cutter_props.cutter_object_name]
         activate(cutob)
         bpy.ops.object.duplicate()
         bpy.ops.rigidbody.object_add(type='ACTIVE')
         cutter = bpy.context.active_object
-        scale = o.cutter_diameter / cutob.dimensions.x
+        scale = cutter_props.cutter_diameter / cutob.dimensions.x
         cutter.scale *= BULLET_SCALE * scale
         bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
         bpy.ops.object.origin_set(type='GEOMETRY_ORIGIN', center='BOUNDS')
@@ -95,6 +97,8 @@ def getCutterBullet(o):
         cutter.location = CUTTER_OFFSET
 
     cutter.name = 'cam_cutter'
+
+    #Hum.. assign to the base cutter object for potential optimisation? I suppose the shape should be bound per-cutter, not per-op
     o.cutter_shape = cutter
     return cutter
 
@@ -147,6 +151,9 @@ def prepareBulletCollision(o):
     progress('preparing collisions')
 
     print(o.name)
+
+    cutter_props = o.getOpCuttingTool()
+
     active_collection = bpy.context.view_layer.active_layer_collection.collection
     t = time.time()
     s = bpy.context.scene
@@ -182,7 +189,7 @@ def prepareBulletCollision(o):
 
         # subdivide long edges here:
         if o.exact_subdivide_edges:
-            subdivideLongEdges(collisionob, o.cutter_diameter * 2)
+            subdivideLongEdges(collisionob, cutter_props.cutter_diameter * 2)
 
         bpy.ops.rigidbody.object_add(type='ACTIVE')  # using active instead of passive because of performance.TODO: check if this works also with 4axis...
         collisionob.rigid_body.collision_shape = 'MESH'

@@ -98,7 +98,6 @@ class Creator(iso.Creator):
 	def tool_change(self, id):
 		#if id in self.tool_defn_params and self.output_comment_before_tool_change:
 			
-			# self.comment('Tool change to \'' + self.tool_defn_params[id]['name'] + '\' (' + self.tool_defn_params[id]['description'] + ')  - D = %s type %s flutes %s' % (strInUnits(o.cutter_diameter, 4), o.cutter_type, o.cutter_flutes));
 		
 		if self.first_tool: 
 			self.first_tool = False

@@ -333,6 +333,8 @@ def samplePathLow(o, ch1, ch2, dosample):
 	d = v.length
 	v.normalize()
 
+	cutter_props = o.getOpCuttingTool()
+
 	vref = Vector((0, 0, 0))
 	bpath = camPathChunk([])
 	i = 0
@@ -373,17 +375,20 @@ def sampleChunks(o, pathSamples, layers):
 	#
 	minx, miny, minz, maxx, maxy, maxz = o.min.x, o.min.y, o.min.z, o.max.x, o.max.y, o.max.z
 	getAmbient(o)
+	cutter_props = o.getOpCuttingTool()
 
 	if o.use_exact:	 # prepare collision world
 		if o.use_opencamlib:
 			oclSample(o, pathSamples)
 			cutterdepth = 0
 		else:
+			print(o.update_bullet_collision_tag)
 			if o.update_bullet_collision_tag:
 				prepareBulletCollision(o)
 
 				o.update_bullet_collision_tag = False
 			# print (o.ambient)
+			print(o.update_bullet_collision_tag)
 			cutter = o.cutter_shape
 			cutterdepth = cutter.dimensions.z / 2
 	else:
@@ -394,7 +399,7 @@ def sampleChunks(o, pathSamples, layers):
 
 		coordoffset = o.borderwidth + pixsize / 2  # -m
 
-		res = ceil(o.cutter_diameter / o.pixsize)
+		res = ceil(cutter_props.cutter_diameter / o.pixsize)
 		m = res / 2
 
 	t = time.time()
@@ -620,6 +625,9 @@ def sampleChunksNAxis(o, pathSamples, layers):
 		getAmbient(o)
 		o.update_bullet_collision_tag = False
 	# print (o.ambient)
+
+	cutter_props = o.getOpCuttingTool()
+
 	cutter = o.cutter_shape
 	cutterdepth = cutter.dimensions.z / 2
 
@@ -676,7 +684,7 @@ def sampleChunksNAxis(o, pathSamples, layers):
 				# cutter.rotation_euler.x=-cutter.rotation_euler.x
 				# print(rotation)
 
-				if o.cutter_type == 'VCARVE':  # Bullet cone is always pointing Up Z in the object
+				if cutter_props.cutter_type == 'VCARVE':  # Bullet cone is always pointing Up Z in the object
 					cutter.rotation_euler.x += pi
 				cutter.update_tag()
 				# bpy.context.scene.frame_set(-1)
@@ -1251,20 +1259,23 @@ def exportGcodePath(filename, vertslist, operations):
 		else:
 			spdir_clockwise = False
 
+
+		cutter_props = o.getOpCuttingTool()
+
 		# write tool, not working yet probably
 		# print (last_cutter)
-		if ((not use_experimental) or m.output_tool_change) and last_cutter != [o.cutter_id, o.cutter_diameter,
-																				o.cutter_type, o.cutter_flutes]:
+		if ((not use_experimental) or m.output_tool_change) and last_cutter != [cutter_props.cutter_id, cutter_props.cutter_diameter,
+																				cutter_props.cutter_type, cutter_props.cutter_flutes]:
 			if c.output_comment_before_tool_change:
 				c.comment('Tool change - D = %s type %s flutes %s' % (
-				strInUnits(o.cutter_diameter, 4), o.cutter_type, o.cutter_flutes))
+				strInUnits(cutter_props.cutter_diameter, 4), cutter_props.cutter_type, cutter_props.cutter_flutes))
 			#Commented out because of tweaks
 			#print(dir(o));
-			c.tool_defn(o.cutter_id, o.cutter_name, {'diameter': o.cutter_diameter, 'type': o.cutter_type, 'flutes': o.cutter_flutes, 'cutting edge height': o.cutter_length, 'tip angle': o.cutter_tip_angle, 'description': o.cutter_description, 'name': o.cutter_name, 'id': o.cutter_id})
-			c.tool_change(o.cutter_id)
+			c.tool_defn(cutter_props.cutter_id, cutter_props.cutter_name, {'diameter': cutter_props.cutter_diameter, 'type': cutter_props.cutter_type, 'flutes': cutter_props.cutter_flutes, 'cutting edge height': cutter_props.cutter_length, 'tip angle': cutter_props.cutter_tip_angle, 'description': cutter_props.cutter_description, 'name': cutter_props.cutter_name, 'id': cutter_props.cutter_id})
+			c.tool_change(cutter_props.cutter_id)
 			c.flush_nc()
 
-		last_cutter = [o.cutter_id, o.cutter_diameter, o.cutter_type, o.cutter_flutes]
+		last_cutter = [cutter_props.cutter_id, cutter_props.cutter_diameter, cutter_props.cutter_type, cutter_props.cutter_flutes]
 
 		c.spindle(o.spindle_rpm, spdir_clockwise)
 		c.write_spindle()
@@ -1413,15 +1424,14 @@ def exportGcodePath(filename, vertslist, operations):
 				c = startNewFile()
 				c.flush_nc()
 				#c.comment('Tool change - D = %s type %s flutes %s' % (
-				#strInUnits(o.cutter_diameter, 4), o.cutter_type, o.cutter_flutes))
-				#c.tool_change(o.cutter_id)
+				
 				if c.output_comment_before_tool_change:
 					c.comment('Tool change - D = %s type %s flutes %s' % (
-					strInUnits(o.cutter_diameter, 4), o.cutter_type, o.cutter_flutes))
+					strInUnits(cutter_props.cutter_diameter, 4), cutter_props.cutter_type, cutter_props.cutter_flutes))
 				#Commented out because reasons
 				#print(dir(o));
-				c.tool_defn(o.cutter_id, o.cutter_name, {'diameter': o.cutter_diameter, 'type': o.cutter_type, 'flutes': o.cutter_flutes, 'cutting edge height': o.cutter_length, 'tip angle': o.cutter_tip_angle, 'description': o.cutter_description, 'name': o.cutter_name, 'id': o.cutter_id})
-				c.tool_change(o.cutter_id)
+				c.tool_defn(cutter_props.cutter_id, cutter_props.cutter_name, {'diameter': cutter_props.cutter_diameter, 'type': cutter_props.cutter_type, 'flutes': cutter_props.cutter_flutes, 'cutting edge height': cutter_props.cutter_length, 'tip angle': cutter_props.cutter_tip_angle, 'description': cutter_props.cutter_description, 'name': cutter_props.cutter_name, 'id': cutter_props.cutter_id})
+				c.tool_change(cutter_props.cutter_id)
 				
 				c.spindle(o.spindle_rpm, spdir_clockwise)
 				c.write_spindle()
@@ -1869,9 +1879,11 @@ def getObjectSilhouete(stype, objects=None, use_modifiers=False):
 
 
 def getAmbient(o):
+	cutter_props = o.getOpCuttingTool()
+
 	if o.update_ambient_tag:
 		if o.ambient_cutter_restrict:  # cutter stays in ambient & limit curve
-			m = o.cutter_diameter / 2
+			m = cutter_props.cutter_diameter / 2
 		else:
 			m = 0
 
@@ -1891,7 +1903,7 @@ def getAmbient(o):
 				# for p in polys:
 				#	o.limit_poly+=p
 				if o.ambient_cutter_restrict:
-					o.limit_poly = o.limit_poly.buffer(o.cutter_diameter / 2, resolution=o.circle_detail)
+					o.limit_poly = o.limit_poly.buffer(cutter_props.cutter_diameter / 2, resolution=o.circle_detail)
 			o.ambient = o.ambient.intersection(o.limit_poly)
 	o.update_ambient_tag = False
 
@@ -2102,6 +2114,9 @@ def addBridge(x, y, rot, sizex, sizey):
 def addAutoBridges(o):
 	"""attempt to add auto bridges as set of curves"""
 	getOperationSources(o)
+
+	cutter_props = o.getOpCuttingTool()
+
 	# if not o.onlycurves:
 	#	o.warnings+=('not curves')
 	#	return;
@@ -2124,28 +2139,31 @@ def addAutoBridges(o):
 			minx, miny, maxx, maxy = c.bounds
 			d1 = c.project(sgeometry.Point(maxx + 1000, (maxy + miny) / 2.0))
 			p = c.interpolate(d1)
-			bo = addBridge(p.x, p.y, -pi / 2, o.bridges_width, o.cutter_diameter * 1)
+			bo = addBridge(p.x, p.y, -pi / 2, o.bridges_width, cutter_props.cutter_diameter * 1)
 			g.objects.link(bo)
 			bpy.context.collection.objects.unlink(bo)
 			d1 = c.project(sgeometry.Point(minx - 1000, (maxy + miny) / 2.0))
 			p = c.interpolate(d1)
-			bo = addBridge(p.x, p.y, pi / 2, o.bridges_width, o.cutter_diameter * 1)
+			bo = addBridge(p.x, p.y, pi / 2, o.bridges_width, cutter_props.cutter_diameter * 1)
 			g.objects.link(bo)
 			bpy.context.collection.objects.unlink(bo)
 			d1 = c.project(sgeometry.Point((minx + maxx) / 2.0, maxy + 1000))
 			p = c.interpolate(d1)
-			bo = addBridge(p.x, p.y, 0, o.bridges_width, o.cutter_diameter * 1)
+			bo = addBridge(p.x, p.y, 0, o.bridges_width, cutter_props.cutter_diameter * 1)
 			g.objects.link(bo)
 			bpy.context.collection.objects.unlink(bo)
 			d1 = c.project(sgeometry.Point((minx + maxx) / 2.0, miny - 1000))
 			p = c.interpolate(d1)
-			bo = addBridge(p.x, p.y, pi, o.bridges_width, o.cutter_diameter * 1)
+			bo = addBridge(p.x, p.y, pi, o.bridges_width, cutter_props.cutter_diameter * 1)
 			g.objects.link(bo)
 			bpy.context.collection.objects.unlink(bo)
 
 
 def getBridgesPoly(o):
 	if not hasattr(o, 'bridgespolyorig'):
+		
+		cutter_props = o.getOpCuttingTool()
+
 		bridgecollectionname = o.bridges_collection_name
 		bridgecollection = bpy.data.collections[bridgecollectionname]
 		shapes = []
@@ -2164,7 +2182,7 @@ def getBridgesPoly(o):
 		bridgespoly = sops.unary_union(shapes)
 
 		# buffer the poly, so the bridges are not actually milled...
-		o.bridgespolyorig = bridgespoly.buffer(distance=o.cutter_diameter / 2.0)
+		o.bridgespolyorig = bridgespoly.buffer(distance=cutter_props.cutter_diameter / 2.0)
 		o.bridgespoly_boundary = o.bridgespolyorig.boundary
 		o.bridgespoly_boundary_prep = prepared.prep(o.bridgespolyorig.boundary)
 		o.bridgespoly = prepared.prep(o.bridgespolyorig)
@@ -2309,6 +2327,9 @@ def getLayers(operation, startdepth, enddepth):
 def strategy_cutout(o):
 	# ob=bpy.context.active_object
 	print('operation: cutout')
+
+	cutter_props = o.getOpCuttingTool()
+
 	offset = True
 	if o.cut_type == 'ONLINE' and o.onlycurves == True:	 # is separate to allow open curves :)
 		print('separate')
@@ -2331,7 +2352,7 @@ def strategy_cutout(o):
 			if o.cut_type == 'INSIDE':
 				offset = False
 
-			p = getObjectOutline(o.cutter_diameter / 2, o, offset)
+			p = getObjectOutline(cutter_props.cutter_diameter / 2, o, offset)
 			if o.outlines_count > 1:
 				for i in range(1, o.outlines_count):
 					chunksFromCurve.extend(shapelyToChunks(p, -1))
@@ -2502,7 +2523,10 @@ def strategy_proj_curve(s, o):
 
 def strategy_pocket(o):
 	print('operation: pocket')
-	p = getObjectOutline(o.cutter_diameter / 2, o, False)
+
+	cutter_props = o.getOpCuttingTool()
+
+	p = getObjectOutline(cutter_props.cutter_diameter / 2, o, False)
 	approxn = (min(o.max.x - o.min.x, o.max.y - o.min.y) / o.dist_between_paths) / 2
 	i = 0
 	chunks = []
@@ -2510,15 +2534,15 @@ def strategy_pocket(o):
 	lastchunks = []
 	centers = None
 	firstoutline = p  # for testing in the end.
-	prest = p.buffer(-o.cutter_diameter / 2, o.circle_detail)
+	prest = p.buffer(-cutter_props.cutter_diameter / 2, o.circle_detail)
 	# shapelyToCurve('testik',p,0)
 	while not p.is_empty:
 		nchunks = shapelyToChunks(p, o.min.z)
 
 		pnew = p.buffer(-o.dist_between_paths, o.circle_detail)
 
-		if o.dist_between_paths > o.cutter_diameter / 2.0:
-			prest = prest.difference(pnew.boundary.buffer(o.cutter_diameter / 2, o.circle_detail))
+		if o.dist_between_paths > cutter_props.cutter_diameter / 2.0:
+			prest = prest.difference(pnew.boundary.buffer(cutter_props.cutter_diameter / 2, o.circle_detail))
 			if not (pnew.contains(prest)):
 				# shapelyToCurve('cesta',pnew,0)
 				# shapelyToCurve('problemas',prest,0)
@@ -2574,7 +2598,7 @@ def strategy_pocket(o):
 
 		###########helix_enter first try here TODO: check if helix radius is not out of operation area.
 		if o.helix_enter:
-			helix_radius = o.cutter_diameter * 0.5 * o.helix_diameter * 0.01  # 90 percent of cutter radius
+			helix_radius = cutter_props.cutter_diameter * 0.5 * o.helix_diameter * 0.01  # 90 percent of cutter radius
 			helix_circumference = helix_radius * pi * 2
 
 			revheight = helix_circumference * tan(o.ramp_in_angle)
@@ -2582,7 +2606,7 @@ def strategy_pocket(o):
 				if chunksFromCurve[chi].children == []:
 					p = ch.points[0]  # TODO:intercept closest next point when it should stay low
 					# first thing to do is to check if helix enter can really enter.
-					checkc = Circle(helix_radius + o.cutter_diameter / 2, o.circle_detail)
+					checkc = Circle(helix_radius + cutter_props.cutter_diameter / 2, o.circle_detail)
 					checkc = affinity.translate(checkc, p[0], p[1])
 					covers = False
 					for poly in o.silhouete:
@@ -2651,7 +2675,7 @@ def strategy_pocket(o):
 					c = sgeometry.Polygon(c)
 					# print('çoutline')
 					# print(c)
-					coutline = c.buffer(o.cutter_diameter / 2, o.circle_detail)
+					coutline = c.buffer(cutter_props.cutter_diameter / 2, o.circle_detail)
 					# print(h)
 					# print('çoutline')
 					# print(coutline)
@@ -2662,7 +2686,7 @@ def strategy_pocket(o):
 					for poly in o.silhouete:
 						if poly.contains(coutline):
 							covers = True
-							break;
+							break
 
 					if covers:
 						ch.points.extend(rothelix)
@@ -2781,23 +2805,25 @@ def strategy_medial_axis(o):
 
 	chunks = []
 
+	cutter_props = o.getOpCuttingTool()
+
 	gpoly = spolygon.Polygon()
-	angle = o.cutter_tip_angle
+	angle = cutter_props.cutter_tip_angle
 	slope = math.tan(math.pi * (90 - angle / 2) / 180)
-	if o.cutter_type == 'VCARVE':
-		angle = o.cutter_tip_angle
+	if cutter_props.cutter_type == 'VCARVE':
+		angle = cutter_props.cutter_tip_angle
 		# start the max depth calc from the "start depth" of the operation.
-		maxdepth = o.maxz - math.tan(math.pi * (90 - angle / 2) / 180) * o.cutter_diameter / 2
+		maxdepth = o.maxz - math.tan(math.pi * (90 - angle / 2) / 180) * cutter_props.cutter_diameter / 2
 		# don't cut any deeper than the "end depth" of the operation.
 		if maxdepth < o.minz:
 			maxdepth = o.minz
 			# the effective cutter diameter can be reduced from it's max since we will be cutting shallower than the original maxdepth
 			# without this, the curve is calculated as if the diameter was at the original maxdepth and we get the bit
 			# pulling away from the desired cut surface
-			o.cutter_diameter = (maxdepth - o.maxz) / (- math.tan(math.pi * (90 - angle / 2) / 180)) * 2
-	elif o.cutter_type == 'BALLNOSE' or o.cutter_type == 'BALL':
+			cutter_props.cutter_diameter = (maxdepth - o.maxz) / (- math.tan(math.pi * (90 - angle / 2) / 180)) * 2
+	elif cutter_props.cutter_type == 'BALLNOSE' or o.cutter_type == 'BALL':
 		# angle = o.cutter_tip_angle
-		maxdepth = o.cutter_diameter / 2
+		maxdepth = cutter_props.cutter_diameter / 2
 	else:
 		o.warnings += 'Only Ballnose, Ball and V-carve cutters\n are supported'
 		return
@@ -2857,14 +2883,14 @@ def strategy_medial_axis(o):
 				vertr.append((True, -1))
 			else:
 				vertr.append((False, newIdx))
-				if o.cutter_type == 'VCARVE':
+				if cutter_props.cutter_type == 'VCARVE':
 					# start the z depth calc from the "start depth" of the operation.
 					z = o.maxz - mpoly.boundary.distance(sgeometry.Point(p)) * slope
 					if z < maxdepth:
 						z = maxdepth
-				elif o.cutter_type == 'BALL' or o.cutter_type == 'BALLNOSE':
+				elif cutter_props.cutter_type == 'BALL' or cutter_props.cutter_type == 'BALLNOSE':
 					d = mpoly_boundary.distance(sgeometry.Point(p))
-					r = o.cutter_diameter / 2.0
+					r = cutter_props.cutter_diameter / 2.0
 					if d >= r:
 						z = -r
 					else:
@@ -2895,7 +2921,7 @@ def strategy_medial_axis(o):
 				ledges.append(sgeometry.LineString((filteredPts[vertr[e[0]][1]], filteredPts[vertr[e[1]][1]])))
 		# print(ledges[-1].has_z)
 
-		bufpoly = poly.buffer(-o.cutter_diameter / 2, resolution=64)
+		bufpoly = poly.buffer(-cutter_props.cutter_diameter / 2, resolution=64)
 
 		lines = shapely.ops.linemerge(ledges)
 		# print(lines.type)

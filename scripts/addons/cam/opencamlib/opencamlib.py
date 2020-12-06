@@ -128,11 +128,13 @@ def oclGetWaterline(operation, chunks):
     layers = oclWaterlineLayerHeights(operation)
     oclSTL = get_oclSTL(operation)
 
-    op_cutter_type = operation.cutter_type
-    op_cutter_diameter = operation.cutter_diameter
+    cutter_props = operation.getOpCuttingTool()
+
+    op_cutter_type = cutter_props.cutter_type
+    op_cutter_diameter = cutter_props.cutter_diameter
     op_minz = operation.minz
     if op_cutter_type == "VCARVE":
-        op_cutter_tip_angle = operation['cutter_tip_angle']
+        op_cutter_tip_angle = cutter_props.cutter_tip_angle
 
     cutter = None
     cutter_length = 150 #TODO: automatically determine necessary cutter length depending on object size
