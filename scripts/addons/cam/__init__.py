@@ -515,9 +515,11 @@ class CuttingToolDefinition(bpy.types.PropertyGroup):
     cutter_length: FloatProperty(name="#Cutting edge height", description="#not supported#Cutter length", min=0.0, max=100.0,
                                   default=0.025, precision=PRECISION, unit="LENGTH", update=updateToolsOffsetImage)
 
-    cutter_total_length: FloatProperty(name="Total Tool Length", description="Used for tool change clearance and automatic z adjustment in some cases", min=0.0, max=100.0,
+    cutter_total_length: FloatProperty(name="Total Tool Length", description="Used for tool change clearance  in some cases", min=0.0, max=100.0,
                                   default=0.025, precision=PRECISION, unit="LENGTH", update=updateToolsRest)
 
+    cutter_collet_tip_distance: FloatProperty(name="Holder-to-tip distance", description="The parallel distance from the face of the tool holder to the tip of the tool when fully inserted. Used for automatic z adjustment in some cases. ", min=0.0, max=100.0,
+                                  default=0.025, precision=PRECISION, unit="LENGTH", update=updateToolsRest)
     #cutter_shank_length: FloatProperty(name="Tool Shank Length", description="Used for automatic z-adjustment on tool change", min=0.0, max=100.0,
     #                              default=0.025, precision=PRECISION, unit="LENGTH", update=updateOffsetImage)
 
@@ -531,7 +533,19 @@ class CuttingToolDefinition(bpy.types.PropertyGroup):
     # Needs to be this way or it doesn't get remembered properly
     cutter_static_id: IntProperty(name="Static ID", description="Internal Static ID", min=0, max=1024, default=0)
 
-    #def createDict():
+    def asDict(self):
+        return {'diameter': self.cutter_diameter, 
+                'type': self.cutter_type, 
+                'flutes': self.cutter_flutes, 
+                'cutting edge height': self.cutter_length, 
+                'tip angle': self.cutter_tip_angle, 
+                'description': self.cutter_description, 
+                'name': self.cutter_name, 
+                'id': self.cutter_id,
+                'static_id': self.cutter_static_id,
+                'total_length': self.cutter_total_length,
+                'collet_tip_distance': self.cutter_collet_tip_distance,
+            }
 
     
 
@@ -1087,9 +1101,10 @@ class AddPresetCamCutter(bl_operators.presets.AddPresetBase, Operator):
         "d.cutter_length",
         "d.cutter_flutes",
         "d.cutter_tip_angle",
-        #"d.cutter_description",
+        "d.cutter_description",
         #"d.cutter_name",
         "d.cutter_total_length",
+        "d.cutter_collet_tip_distance",
     ]
 
     preset_subdir = "cam_cutters"

@@ -1264,18 +1264,17 @@ def exportGcodePath(filename, vertslist, operations):
 
 		# write tool, not working yet probably
 		# print (last_cutter)
-		if ((not use_experimental) or m.output_tool_change) and last_cutter != [cutter_props.cutter_id, cutter_props.cutter_diameter,
-																				cutter_props.cutter_type, cutter_props.cutter_flutes]:
+		if ((not use_experimental) or m.output_tool_change) and last_cutter != cutter_props.cutter_static_id:
 			if c.output_comment_before_tool_change:
 				c.comment('Tool change - D = %s type %s flutes %s' % (
 				strInUnits(cutter_props.cutter_diameter, 4), cutter_props.cutter_type, cutter_props.cutter_flutes))
 			#Commented out because of tweaks
-			#print(dir(o));
-			c.tool_defn(cutter_props.cutter_id, cutter_props.cutter_name, {'diameter': cutter_props.cutter_diameter, 'type': cutter_props.cutter_type, 'flutes': cutter_props.cutter_flutes, 'cutting edge height': cutter_props.cutter_length, 'tip angle': cutter_props.cutter_tip_angle, 'description': cutter_props.cutter_description, 'name': cutter_props.cutter_name, 'id': cutter_props.cutter_id})
-			c.tool_change(cutter_props.cutter_id)
+			print(cutter_props.asDict())
+			c.tool_defn(cutter_props.cutter_static_id, cutter_props.cutter_name, cutter_props.asDict())
+			c.tool_change(cutter_props.cutter_static_id)
 			c.flush_nc()
 
-		last_cutter = [cutter_props.cutter_id, cutter_props.cutter_diameter, cutter_props.cutter_type, cutter_props.cutter_flutes]
+		last_cutter = cutter_props.cutter_static_id
 
 		c.spindle(o.spindle_rpm, spdir_clockwise)
 		c.write_spindle()
@@ -1430,8 +1429,8 @@ def exportGcodePath(filename, vertslist, operations):
 					strInUnits(cutter_props.cutter_diameter, 4), cutter_props.cutter_type, cutter_props.cutter_flutes))
 				#Commented out because reasons
 				#print(dir(o));
-				c.tool_defn(cutter_props.cutter_id, cutter_props.cutter_name, {'diameter': cutter_props.cutter_diameter, 'type': cutter_props.cutter_type, 'flutes': cutter_props.cutter_flutes, 'cutting edge height': cutter_props.cutter_length, 'tip angle': cutter_props.cutter_tip_angle, 'description': cutter_props.cutter_description, 'name': cutter_props.cutter_name, 'id': cutter_props.cutter_id})
-				c.tool_change(cutter_props.cutter_id)
+				c.tool_defn(cutter_props.cutter_static_id, cutter_props.cutter_name, cutter_props.asDict())
+				c.tool_change(cutter_props.cutter_static_id)
 				
 				c.spindle(o.spindle_rpm, spdir_clockwise)
 				c.write_spindle()

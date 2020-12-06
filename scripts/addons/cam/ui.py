@@ -449,6 +449,7 @@ class CAM_CUTTING_TOOLS_Panel(CAMButtonsPanel, bpy.types.Panel):
                 
                 layout.prop(ao, 'cutter_diameter')
                 layout.prop(ao,'cutter_total_length')
+                layout.prop(ao,'cutter_collet_tip_distance')
 
                 #layout.prop(ao,'cutter_length')
                 layout.prop(ao, 'cutter_flutes')

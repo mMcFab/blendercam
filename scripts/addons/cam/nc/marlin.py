@@ -99,18 +99,18 @@ class Creator(iso.Creator):
 		#if id in self.tool_defn_params and self.output_comment_before_tool_change:
 			
 		
-		if self.first_tool: 
+		if self.first_tool:
 			self.first_tool = False
 			if self.output_comment_before_tool_change:
 				self.comment('Not changing tool since this is the first one')
 		else: 
 			if self.output_comment_before_tool_change:
-				self.comment('Automagic tool change thing made for Marlin - DOES NOT CURRENTLY COMPENSATE FOR TOOL HEIGHT DIFFERENCES!')
+				self.comment('Automagic tool change thing made for Marlin!')
 			#self.write(self.SPACE() + self.FEED() + self.SPACE_STR() + self.Z() + ('%.2f' % (self.free_movement_height)) + '; \'feed\' to safe Z (keeps things slower and safer than a quick move) z is currently 10cm until I work out the safe position');
 			#Should add max new tool height to allow removal?
 			add_to_shift_z = 0
-			arbitrary_shank_length = 30
-			resting_z = self.free_movement_height + arbitrary_shank_length
+			#arbitrary_shank_length = 30
+			resting_z = self.free_movement_height# + arbitrary_shank_length
 			
 			#print(self.tool_defn_params[self.t]);
 			if(id != None and id in self.tool_defn_params):
@@ -118,11 +118,11 @@ class Creator(iso.Creator):
 					#print(self.tool_defn_params[id]);
 					# This will actually only make a difference if we can specify tool lengths. 
 					#print(self.shift_z);
-					self.shift_z += 1000 * (self.tool_defn_params[id]['cutting edge height'] - self.tool_defn_params[self.t]['cutting edge height'])
+					add_to_shift_z += 1000 * (self.tool_defn_params[id]['collet_tip_distance'] - self.tool_defn_params[self.t]['collet_tip_distance'])
 					#print(self.shift_z);
-					resting_z += 1000 * max(self.tool_defn_params[id]['cutting edge height'], self.tool_defn_params[self.t]['cutting edge height'])
-				else: 
-					resting_z += 1000 * self.tool_defn_params[id]['cutting edge height']
+					resting_z += 1000 * max(self.tool_defn_params[id]['total_length'], self.tool_defn_params[self.t]['total_length'])
+				else:
+					resting_z += 1000 * self.tool_defn_params[id]['total_length']
 					
 			
 			
