@@ -1068,6 +1068,7 @@ class camOperation(bpy.types.PropertyGroup):
 
 class opReference(bpy.types.PropertyGroup):  # this type is defined just to hold reference to operations for chains
     name: bpy.props.StringProperty(name="Operation name", default="Operation")
+    operation: bpy.props.PointerProperty(type=camOperation)
     computing = False  # for UiList display
 
 
@@ -1079,7 +1080,7 @@ class camChain(bpy.types.PropertyGroup):  # chain is just a set of operations wh
     filename: bpy.props.StringProperty(name="File name", default="Chain")  # filename of
     valid: bpy.props.BoolProperty(name="Valid", description="True if whole chain is ok for calculation", default=True);
     computing: bpy.props.BoolProperty(name="Computing right now", description="", default=False)
-    operations: bpy.props.CollectionProperty(type=opReference)  # this is to hold just operation names.
+    operations: bpy.props.CollectionProperty(type=opReference) 
 
 
 
@@ -1464,7 +1465,7 @@ def register():
     s.cam_slice = bpy.props.PointerProperty(type=SliceObjectsSettings)
 
     s.cam_cutting_tools = bpy.props.CollectionProperty(type=CuttingToolDefinition)
-    s.cam_cutting_tools_items = []
+    #s.cam_cutting_tools_items = []
 
     s.cam_active_cutting_tool = bpy.props.IntProperty(name="CAM Active Cutting Tool", description="The selected cutting tool")
 
@@ -1481,5 +1482,7 @@ def unregister():
 
     del s.cam_active_operation
     del s.cam_machine
+
+    del s.cam_cutters
     # bpy.app.handlers.scene_update_pre.remove(ops.timer_update)
 # bpy.types.INFO_HT_header.remove(header_info)

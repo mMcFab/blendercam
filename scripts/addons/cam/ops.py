@@ -329,19 +329,62 @@ class PathsChain(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class PathExportChain(bpy.types.Operator):
+
+
+class PathExportChain(bpy.types.Operator, ExportHelper):
     """calculate a chain and export the gcode alltogether. """
     bl_idname = "object.cam_export_paths_chain"
     bl_label = "Export CAM paths in current chain as gcode"
     bl_options = {'REGISTER', 'UNDO'}
 
-    filename_ext = ".txt"
+    filename_ext = ""
 
     filter_glob: StringProperty(
-        default="*.txt",
+        default="*",
         options={'HIDDEN'},
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
+    
+    def invoke(self, context, event):
+        import os
+
+        
+        extension = '.tap'
+        m = bpy.context.scene.cam_machine
+        if m.post_processor == 'EMC':
+            extension = '.ngc'
+        elif m.post_processor == 'GRBL':
+            extension = '.ngc'
+        elif m.post_processor == 'MARLIN':
+            extension = '.gcode'
+        elif m.post_processor == 'HEIDENHAIN':
+            extension = '.H'
+        elif m.post_processor == 'HEIDENHAIN530':
+            extension = '.H'
+        elif m.post_processor == 'GRAVOS':
+            extension = '.nc'
+        elif m.post_processor == 'WIN-PC':
+            extension = '.din'
+        elif m.post_processor == 'SHOPBOT MTC':
+            extension = '.sbp'
+        elif m.post_processor == 'LYNX_OTTER_O':
+            extension = '.nc'
+            
+            
+        self.filename_ext = extension
+        self.filter_glob = "*" + extension
+
+        if not self.filepath:
+            blend_filepath = context.blend_data.filepath
+            if not blend_filepath:
+                blend_filepath = "untitled"
+            else:
+                blend_filepath = os.path.splitext(blend_filepath)[0]
+
+            self.filepath = blend_filepath + self.filename_ext
+
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
 
     def execute(self, context):
         s = bpy.context.scene
@@ -358,7 +401,6 @@ class PathExportChain(bpy.types.Operator):
         utils.exportGcodePath(self.filepath, meshes, chainops)
         return {'FINISHED'}
 
-
 #class PathExport(bpy.types.Operator):
 class PathExport(bpy.types.Operator, ExportHelper):
     """Export gcode. Can be used only when the path object is present"""
@@ -366,13 +408,53 @@ class PathExport(bpy.types.Operator, ExportHelper):
     bl_label = "Export operation gcode"
     bl_options = {'REGISTER', 'UNDO'}
 
-    filename_ext = ".txt"
+    filename_ext = ""
 
     filter_glob: StringProperty(
-        default="*.txt",
+        default="*",
         options={'HIDDEN'},
         maxlen=255,  # Max internal buffer length, longer would be clamped.
     )
+    def invoke(self, context, event):
+        import os
+
+        
+        extension = '.tap'
+        m = bpy.context.scene.cam_machine
+        if m.post_processor == 'EMC':
+            extension = '.ngc'
+        elif m.post_processor == 'GRBL':
+            extension = '.ngc'
+        elif m.post_processor == 'MARLIN':
+            extension = '.gcode'
+        elif m.post_processor == 'HEIDENHAIN':
+            extension = '.H'
+        elif m.post_processor == 'HEIDENHAIN530':
+            extension = '.H'
+        elif m.post_processor == 'GRAVOS':
+            extension = '.nc'
+        elif m.post_processor == 'WIN-PC':
+            extension = '.din'
+        elif m.post_processor == 'SHOPBOT MTC':
+            extension = '.sbp'
+        elif m.post_processor == 'LYNX_OTTER_O':
+            extension = '.nc'
+            
+            
+        self.filename_ext = extension
+        self.filter_glob = "*" + extension
+
+        if not self.filepath:
+            blend_filepath = context.blend_data.filepath
+            if not blend_filepath:
+                blend_filepath = "untitled"
+            else:
+                blend_filepath = os.path.splitext(blend_filepath)[0]
+
+            self.filepath = blend_filepath + self.filename_ext
+
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
 
     def execute(self, context):
 
@@ -383,6 +465,8 @@ class PathExport(bpy.types.Operator, ExportHelper):
 
         utils.exportGcodePath(self.filepath, [bpy.data.objects["cam_path_{}".format(operation.name)].data], [operation])
         return {'FINISHED'}
+
+
 
 
 class CAMSimulate(bpy.types.Operator):
@@ -504,11 +588,14 @@ class CamChainOperationAdd(bpy.types.Operator):
     def execute(self, context):
         s = bpy.context.scene
         chain = s.cam_chains[s.cam_active_chain]
-        s = bpy.context.scene
+        #s = bpy.context.scene
         # s.chaindata[chain.index].remove(chain.active_operation+1,s.cam_operations[s.cam_active_operation])
         chain.operations.add()
         chain.active_operation += 1
+        #chain.operations[-1].operation = s.cam_operations[s.cam_active_operation]
+        #chain.operations[-1].name = chain.operations[-1].operation.name
         chain.operations[-1].name = s.cam_operations[s.cam_active_operation].name
+        
         return {'FINISHED'}
 
 
@@ -702,9 +789,30 @@ class CamOperationRemove(bpy.types.Operator):
         if ao.name in cam.was_hidden_dict:
             del cam.was_hidden_dict[ao.name]
 
+        
+        # for chain in scene.cam_chains:
+        #     #while scene.cam_active_operation in chain.operations:
+        #     # aoIndex = chain.operations.find(ao)
+        #     # while aoIndex > -1:
+        #     #     chain.operations.remove(aoIndex)
+        #     #     aoIndex = chain.operations.find(ao)
+        #     #     chain.active_operation = -1
+        #     index = 0
+        #     while index < len(chain.operations):
+        #         if(chain.operations[index] == ao):
+        #             chain.operations.remove(index)
+        #             continue
+        #         index += 1
+                
+
+            #if(chain.active_operation == scene.cam_active_operation):
+            #    chain.active_operation = -1
+
         scene.cam_operations.remove(scene.cam_active_operation)
         if scene.cam_active_operation > 0:
             scene.cam_active_operation -= 1
+        
+
 
         return {'FINISHED'}
 

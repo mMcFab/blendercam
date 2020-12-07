@@ -1150,37 +1150,45 @@ def exportGcodePath(filename, vertslist, operations):
 		if totops > m.split_limit:
 			split = True
 			filesnum = ceil(totops / m.split_limit)
-			print('file will be separated into %i files' % filesnum)
-	print('1')
-	#print('egg')
-	print(m.post_processor)
+u			print('file will be separated into %i files' % filesnum)
 	
-	basefilename = bpy.data.filepath[:-len(bpy.path.basename(bpy.data.filepath))] + safeFileName(filename)
+	print("Using '" + m.post_processor + "' Post Processor")
+	#print(filename)
+	#print(safeFileName(filename))
+	
+	split_filename = os.path.splitext(filename)
 
-	extension = '.tap'
+	basefilename = split_filename[0]#bpy.data.filepath[:-len(bpy.path.basename(bpy.data.filepath))] + safeFileName(filename)
+	extension = split_filename[1]
+
+
+	#print(basefilename)
+	#print(extension)
+
+	#extension = '.tap'
 	if m.post_processor == 'ISO':
 		from .nc import iso as postprocessor
 	if m.post_processor == 'MACH3':
 		from .nc import mach3 as postprocessor
 	elif m.post_processor == 'EMC':
-		extension = '.ngc'
+		#extension = '.ngc'
 		from .nc import emc2b as postprocessor
 	elif m.post_processor == 'FADAL':
-		extension = '.tap'
+		#extension = '.tap'
 		from .nc import fadal as postprocessor
 	elif m.post_processor == 'GRBL':
-		extension = '.ngc'
+		#extension = '.ngc'
 		from .nc import grbl as postprocessor
 	elif m.post_processor == 'MARLIN':
-		extension = '.gcode'
+		#extension = '.gcode'
 		from .nc import marlin as postprocessor
 	elif m.post_processor == 'HM50':
 		from .nc import hm50 as postprocessor
 	elif m.post_processor == 'HEIDENHAIN':
-		extension = '.H'
+		#extension = '.H'
 		from .nc import heiden as postprocessor
 	elif m.post_processor == 'HEIDENHAIN530':
-		extension = '.H'
+		#extension = '.H'
 		from .nc import heiden530 as postprocessor
 	elif m.post_processor == 'TNC151':
 		from .nc import tnc151 as postprocessor
@@ -1191,27 +1199,29 @@ def exportGcodePath(filename, vertslist, operations):
 	elif m.post_processor == 'ANILAM':
 		from .nc import anilam_crusader_m as postprocessor
 	elif m.post_processor == 'GRAVOS':
-		extension = '.nc'
+		#extension = '.nc'
 		from .nc import gravos as postprocessor
 	elif m.post_processor == 'WIN-PC':
-		extension = '.din'
+		#extension = '.din'
 		from .nc import winpc as postprocessor
 	elif m.post_processor == 'SHOPBOT MTC':
-		extension = '.sbp'
+		#extension = '.sbp'
 		from .nc import shopbot_mtc as postprocessor
 	elif m.post_processor == 'LYNX_OTTER_O':
-		extension = '.nc'
+		#extension = '.nc'
 		from .nc import lynx_otter_o as postprocessor
 	
 	if s.unit_settings.system == 'METRIC':
 		unitcorr = 1000.0
 	elif s.unit_settings.system == 'IMPERIAL':
-		unitcorr = 1 / 0.0254;
+		unitcorr = 1 / 0.0254
 	else:
-		unitcorr = 1;
+		unitcorr = 1
 	rotcorr = 180.0 / pi
 
 	use_experimental = bpy.context.preferences.addons['cam'].preferences.experimental
+
+
 
 	def startNewFile():
 		fileindex = ''
@@ -1290,7 +1300,7 @@ def exportGcodePath(filename, vertslist, operations):
 				c.comment('Tool change - D = %s type %s flutes %s' % (
 				strInUnits(cutter_props.cutter_diameter, 4), cutter_props.cutter_type, cutter_props.cutter_flutes))
 			#Commented out because of tweaks
-			print(cutter_props.asDict())
+			#print(cutter_props.asDict())
 			c.tool_defn(cutter_props.cutter_static_id, cutter_props.cutter_name, cutter_props.asDict())
 			c.tool_change(cutter_props.cutter_static_id)
 			c.flush_nc()
@@ -1479,7 +1489,7 @@ def exportGcodePath(filename, vertslist, operations):
 
 	c.program_end()
 	c.file_close()
-	print(time.time() - t)
+	print("Export complete! Took " + str(time.time() - t) + "s")
 
 
 def curveToShapely(cob, use_modifiers=False):
@@ -3537,11 +3547,11 @@ def getPath(context, operation):  # should do all path calculations.
 		getPath4axis(context, operation)
 
 	# export gcode if automatic.
-	if operation.auto_export:
-		if bpy.data.objects.get("cam_path_{}".format(operation.name)) is None:
-			return
-		p = bpy.data.objects["cam_path_{}".format(operation.name)]
-		exportGcodePath(operation.filename, [p.data], [operation])
+	# if operation.auto_export:
+	# 	if bpy.data.objects.get("cam_path_{}".format(operation.name)) is None:
+	# 		return
+	# 	p = bpy.data.objects["cam_path_{}".format(operation.name)]
+	# 	exportGcodePath(operation.filename, [p.data], [operation])
 
 	operation.changed = False
 	t1 = time.process_time() - t
