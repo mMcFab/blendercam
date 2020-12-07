@@ -669,7 +669,7 @@ class camOperation(bpy.types.PropertyGroup):
                                 default='Z',
                                 update=updateStrategy)
 
-    skin: FloatProperty(name="Extra Surface Material", description="Extra material to leave when roughing", min=0.0, max=1.0, default=0.0,
+    skin: FloatProperty(name="Extra Surface Material", description="Extra material radius to leave when roughing", min=0.0, max=1.0, default=0.0,
                         precision=PRECISION, unit="LENGTH", update=updateOffsetImage)
     inverse: bpy.props.BoolProperty(name="Inverse Milling", description="Male to female model conversion",
                                     default=False, update=updateOffsetImage)

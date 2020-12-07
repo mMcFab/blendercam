@@ -470,10 +470,11 @@ class CAM_MATERIAL_Panel(CAMButtonsPanel, bpy.types.Panel):
                 if ao.geometry_source in ['OBJECT', 'COLLECTION']:
                     #row = layout.row(align=True)
                     col = box.column()
-                    col.prop(ao, 'material_from_model')
+                    row = col.row()
+                    row.prop(ao, 'material_from_model')
 
                     if ao.material_from_model:
-                        col.prop(ao, 'material_radius_around_model')
+                        row.prop(ao, 'material_radius_around_model')
                     else:
                         col = box.column()
                         col.row().prop(ao, 'material_origin')
