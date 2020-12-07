@@ -1150,7 +1150,7 @@ def exportGcodePath(filename, vertslist, operations):
 		if totops > m.split_limit:
 			split = True
 			filesnum = ceil(totops / m.split_limit)
-u			print('file will be separated into %i files' % filesnum)
+			print('file will be separated into %i files' % filesnum)
 	
 	print("Using '" + m.post_processor + "' Post Processor")
 	#print(filename)

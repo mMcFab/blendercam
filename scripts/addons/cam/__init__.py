@@ -1243,6 +1243,7 @@ def get_panels():  # convenience function for bot register and unregister functi
 
         ui.CAM_MACHINE_Panel,
         ui.CAM_CUTTING_TOOLS_Panel,
+        ui.CAM_CHAINS_Panel,
         ui.CAM_OPERATIONS_Panel,
         ui.CAM_OPERATION_PROPERTIES_Panel,
 
@@ -1256,7 +1257,7 @@ def get_panels():  # convenience function for bot register and unregister functi
         ui.CAM_OPTIMISATION_Panel,
         ui.CAM_GCODE_Panel,
 
-        ui.CAM_CHAINS_Panel,
+        
         # ui.CAM_INFO_Panel,
         
         
