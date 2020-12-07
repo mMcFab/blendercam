@@ -485,6 +485,10 @@ def updateToolsRest(o, context):
     
 
 
+def validateToolName(self, context):
+    self.validateToolName()
+    updateToolsRest(self, context)
+    
 
 class CuttingToolDefinition(bpy.types.PropertyGroup):
     #def __init__(self):
@@ -495,7 +499,7 @@ class CuttingToolDefinition(bpy.types.PropertyGroup):
     #updateoffsetimage
     #updatechipload
 
-    cutter_name: bpy.props.StringProperty(name="Name", default="Tool", update=updateToolsRest)
+    cutter_name: bpy.props.StringProperty(name="Name", default="Tool", update=validateToolName)
     cutter_description: StringProperty(name="Tool Description", default="", update=updateToolsRest)
     
     cutter_type: EnumProperty(name='Type',
@@ -561,11 +565,49 @@ class CuttingToolDefinition(bpy.types.PropertyGroup):
                 #'spindle_rpm': self.spindle_default,
             }
 
+    def validateToolName(self):
+        temp_name = self.cutter_name
+        temp_index = 1
+        do_while = True
+        while do_while:
+            do_while = False
+            for op in bpy.context.scene.cam_cutting_tools:
+                if(op == self):
+                    continue
+                if(op.cutter_name == temp_name):
+                    do_while = True
+                    temp_name = self.cutter_name + "_" + str(temp_index)
+                    temp_index += 1
+                    break
+        
+        self.cutter_name = temp_name
+
+
+
+
+def updateCamOperationName(o, context):
+    #print(o.name)
+    o.validateOperationName()
+
+    # updates all chain things to keep names consistent
+    for chain in bpy.context.scene.cam_chains:
+        for opRef in chain.operations:
+            if(opRef.name == o.old_name):
+                opRef.name = o.name
+
+    o.old_name = o.name
     
+    updateRest(o, context)
+    return
+
+def validateChainName(self, context):
+    self.validateChainName()
+
 
 
 class camOperation(bpy.types.PropertyGroup):
-    name: bpy.props.StringProperty(name="Name", default="Operation", update=updateRest)
+    name: bpy.props.StringProperty(name="Name", default="Operation", update=updateCamOperationName)
+    old_name: bpy.props.StringProperty(name="OldName", default="Operation")
     filename: bpy.props.StringProperty(name="File name", default="Operation", update=updateRest)
     auto_export: bpy.props.BoolProperty(name="Auto export",
                                         description="export files immediately after path calculation", default=False)
@@ -1064,6 +1106,24 @@ class camOperation(bpy.types.PropertyGroup):
     def extUpdateOperationValid(self):
         updateOperationValid(self, bpy.context)
 
+    def validateOperationName(self):
+        temp_name = self.name
+        temp_index = 1
+        do_while = True
+        while do_while:
+            do_while = False
+            for op in bpy.context.scene.cam_operations:
+                if(op == self):
+                    continue
+                if(op.name == temp_name):
+                    do_while = True
+                    temp_name = self.name + "_" + str(temp_index)
+                    temp_index += 1
+                    break
+        
+        self.name = temp_name
+
+
 
 
 class opReference(bpy.types.PropertyGroup):  # this type is defined just to hold reference to operations for chains
@@ -1076,12 +1136,28 @@ class camChain(bpy.types.PropertyGroup):  # chain is just a set of operations wh
     index: bpy.props.IntProperty(name="index", description="index in the hard-defined camChains", default=-1)
     active_operation: bpy.props.IntProperty(name="active operation", description="active operation in chain",
                                             default=-1)
-    name: bpy.props.StringProperty(name="Name", default="Chain")
+    name: bpy.props.StringProperty(name="Name", default="Chain", update=validateChainName)
     filename: bpy.props.StringProperty(name="File name", default="Chain")  # filename of
     valid: bpy.props.BoolProperty(name="Valid", description="True if whole chain is ok for calculation", default=True);
     computing: bpy.props.BoolProperty(name="Computing right now", description="", default=False)
     operations: bpy.props.CollectionProperty(type=opReference) 
-
+    
+    def validateChainName(self):
+        temp_name = self.name
+        temp_index = 1
+        do_while = True
+        while do_while:
+            do_while = False
+            for op in bpy.context.scene.cam_chains:
+                if(op == self):
+                    continue
+                if(op.name == temp_name):
+                    do_while = True
+                    temp_name = self.name + "_" + str(temp_index)
+                    temp_index += 1
+                    break
+        
+        self.name = temp_name
 
 
 

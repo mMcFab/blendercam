@@ -558,7 +558,7 @@ class CamChainAdd(bpy.types.Operator):
         chain.name = 'Sequence_' + str(s.cam_active_chain + 1)
         chain.filename = chain.name
         chain.index = s.cam_active_chain
-
+        chain.validateChainName()
         return {'FINISHED'}
 
 
@@ -709,12 +709,15 @@ class CamOperationAdd(bpy.types.Operator):
         o = s.cam_operations[-1]
         s.cam_active_operation = len(s.cam_operations) - 1
         o.name = 'Cut_' + str(s.cam_active_operation + 1)
+        o.old_name = o.name
         o.filename = o.name
         ob = bpy.context.active_object
         if ob is not None:
             o.object_name = ob.name
             minx, miny, minz, maxx, maxy, maxz = utils.getBoundsWorldspace([ob])
             o.minz = minz
+
+        o.validateOperationName()
 
         return {'FINISHED'}
 
@@ -766,6 +769,8 @@ class CamOperationCopy(bpy.types.Operator):
             o.name = o.name + '_copy'
             o.filename = o.filename + '_copy'
 
+        o.validateOperationName()
+
         return {'FINISHED'}
 
 
@@ -794,24 +799,15 @@ class CamOperationRemove(bpy.types.Operator):
         if ao.name in cam.was_hidden_dict:
             del cam.was_hidden_dict[ao.name]
 
-        
-        # for chain in scene.cam_chains:
-        #     #while scene.cam_active_operation in chain.operations:
-        #     # aoIndex = chain.operations.find(ao)
-        #     # while aoIndex > -1:
-        #     #     chain.operations.remove(aoIndex)
-        #     #     aoIndex = chain.operations.find(ao)
-        #     #     chain.active_operation = -1
-        #     index = 0
-        #     while index < len(chain.operations):
-        #         if(chain.operations[index] == ao):
-        #             chain.operations.remove(index)
-        #             continue
-        #         index += 1
-                
-
-            #if(chain.active_operation == scene.cam_active_operation):
-            #    chain.active_operation = -1
+        # Remove reference from chains - now that opRef names and operation names are sync'd, this should be safe for now. 
+        for chain in scene.cam_chains:
+            index = 0
+            while index < len(chain.operations):
+                if(chain.operations[index].name == ao.name):
+                    chain.operations.remove(index)
+                    chain.active_operation = -1
+                    continue
+                index += 1
 
         scene.cam_operations.remove(scene.cam_active_operation)
         if scene.cam_active_operation > 0:
@@ -1475,6 +1471,7 @@ class CuttingToolAdd(bpy.types.Operator):
         o.cutter_name = 'Tool_' + str(o.cutter_id)
         o.cutter_static_id = (max_existing_static_id + 1)
         
+        o.validateToolName()
         #print("New static ID ", o.cutter_static_id)
         for op in bpy.context.scene.cam_operations:
             #__init__.updateOperationValid(op, context)
@@ -1516,17 +1513,18 @@ class CuttingToolCopy(bpy.types.Operator):
         isdigit = True
         numdigits = 0
 
-        if o.name[-1].isdigit():
+        if o.cutter_name[-1].isdigit():
             numdigits = 1
             while isdigit:
                 numdigits += 1
-                isdigit = o.name[-numdigits].isdigit()
+                isdigit = o.cutter_name[-numdigits].isdigit()
             numdigits -= 1
-            o.name = o.name[:-numdigits] + str(int(o.name[-numdigits:]) + 1).zfill(numdigits)
+            o.cutter_name = o.cutter_name[:-numdigits] + str(int(o.cutter_name[-numdigits:]) + 1).zfill(numdigits)
             
         else:
-            o.name = o.name + '_copy'
-            
+            o.cutter_name = o.cutter_name + '_copy'
+
+        o.validateToolName()
 
         return {'FINISHED'}
 
