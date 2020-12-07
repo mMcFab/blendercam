@@ -671,7 +671,7 @@ class camOperation(bpy.types.PropertyGroup):
 
     skin: FloatProperty(name="Extra Surface Material", description="Extra material to leave when roughing", min=0.0, max=1.0, default=0.0,
                         precision=PRECISION, unit="LENGTH", update=updateOffsetImage)
-    inverse: bpy.props.BoolProperty(name="Inverse milling", description="Male to female model conversion",
+    inverse: bpy.props.BoolProperty(name="Inverse Milling", description="Male to female model conversion",
                                     default=False, update=updateOffsetImage)
     array: bpy.props.BoolProperty(name="Repeat Operation",
                                   description="Create a repetitive array for producing the same thing many times at once",
@@ -774,11 +774,12 @@ class camOperation(bpy.types.PropertyGroup):
     retract_height: bpy.props.FloatProperty(name='Retract arc height', default=0.001, min=0.00000, max=100,
                                             precision=PRECISION, unit="LENGTH", update=updateRest)
 
-    minz_from_ob: bpy.props.BoolProperty(name="Depth from Object", description="Operation ending depth from object",
+    minz_from_ob: bpy.props.BoolProperty(name="End Height from Object Height", description="Operation ending Z position from object",
                                          default=True, update=updateRest)
-    minz: bpy.props.FloatProperty(name="Operation depth end", default=-0.01, min=-3, max=3, precision=PRECISION,
+    minz: bpy.props.FloatProperty(name="Ending Height", default=0.01, min=-3, max=3, precision=PRECISION, description="Minimum Z limit to cut into the material. More negative = deeper cut",
                                   unit="LENGTH",
                                   update=updateRest)  # this is input minz. True minimum z can be something else, depending on material e.t.c.
+    #Currently unused?
     start_type: bpy.props.EnumProperty(name='Start type',
                                        items=(
                                            ('ZLEVEL', 'Z level', 'Starts on a given Z level'),
@@ -789,7 +790,7 @@ class camOperation(bpy.types.PropertyGroup):
                                        default='ZLEVEL',
                                        update=updateStrategy)
 
-    maxz: bpy.props.FloatProperty(name="Operation depth start", description='operation starting depth', default=0,
+    maxz: bpy.props.FloatProperty(name="Starting Height", description='Operation starting height. Any material above this will be ignored for the path calculation', default=0,
                                   min=-3, max=10, precision=PRECISION, unit="LENGTH",
                                   update=updateRest)  # EXPERIMENTAL
 
@@ -831,30 +832,30 @@ class camOperation(bpy.types.PropertyGroup):
                                                      default=math.pi / 45, min=0, max=math.pi * 0.5, precision=0,
                                                      subtype="ANGLE", unit="ROTATION", update=updateRest)
 
-    ambient_behaviour: EnumProperty(name='Ambient', items=(('ALL', 'All', 'a'), ('AROUND', 'Around', 'a')),
+    ambient_behaviour: EnumProperty(name='Cutting Region', items=(('ALL', 'Full Material Surface', 'a'), ('AROUND', 'Around Model', 'a')),
                                      description='handling ambient surfaces', default='ALL', update=updateZbufferImage)
 
-    ambient_radius: FloatProperty(name="Ambient radius",
-                                   description="Radius around the part which will be milled if ambient is set to Around",
+    ambient_radius: FloatProperty(name="Cutting Region Radius",
+                                   description="Radius around the part which will be milled if the cutting region is set to Around Model",
                                    min=0.0, max=100.0, default=0.01, precision=PRECISION, unit="LENGTH",
                                    update=updateRest)
     # ambient_cutter = EnumProperty(name='Borders',items=(('EXTRAFORCUTTER', 'Extra for cutter', "Extra space for cutter is cut around the segment"),('ONBORDER', "Cutter on edge", "Cutter goes exactly on edge of ambient with it's middle") ,('INSIDE', "Inside segment", 'Cutter stays within segment')  ),description='handling of ambient and cutter size',default='INSIDE')
-    use_limit_curve: bpy.props.BoolProperty(name="Use limit curve", description="A curve limits the operation area",
+    use_limit_curve: bpy.props.BoolProperty(name="Use Limit Curve", description="A curve limits the operation area",
                                              default=False, update=updateRest)
-    ambient_cutter_restrict: bpy.props.BoolProperty(name="Cutter stays in ambient limits",
-                                                    description="Cutter doesn't get out from ambient limits otherwise goes on the border exactly",
+    ambient_cutter_restrict: bpy.props.BoolProperty(name="Cutter Radius stays Within Cutting Region",
+                                                    description="Cutter radius is considered and is kept within region limits, otherwise it cuts on the border exactly",
                                                     default=True,
                                                     update=updateRest)  # restricts cutter inside ambient only
-    limit_curve: bpy.props.StringProperty(name='Limit curve',
+    limit_curve: bpy.props.StringProperty(name='Limit Curve',
                                           description='curve used to limit the area of the operation',
                                           update=updateRest)
 
     # feeds
     feedrate: FloatProperty(name="Feedrate", description="Feedrate", min=0.00005, max=50.0, default=1.0,
                             precision=PRECISION, unit="LENGTH", update=updateChipload)
-    plunge_feedrate: FloatProperty(name="Plunge speed ", description="% of feedrate", min=0.1, max=100.0, default=50.0,
+    plunge_feedrate: FloatProperty(name="Plunge Feedrate", description="% of feedrate", min=0.1, max=100.0, default=50.0,
                                    precision=1, subtype='PERCENTAGE', update=updateRest)
-    plunge_angle: bpy.props.FloatProperty(name="Plunge angle",
+    plunge_angle: bpy.props.FloatProperty(name="Plunge Angle",
                                           description="What angle is already considered to plunge",
                                           default=math.pi / 6, min=0, max=math.pi * 0.5, precision=0, subtype="ANGLE",
                                           unit="ROTATION", update=updateRest)
@@ -877,7 +878,7 @@ class camOperation(bpy.types.PropertyGroup):
     parallel_step_back: bpy.props.BoolProperty(name="Parallel step back",
                                                description='For roughing and finishing in one pass: mills material in climb mode, then steps back and goes between 2 last chunks back',
                                                default=False, update=updateRest)
-    stay_low: bpy.props.BoolProperty(name="Stay low if possible", default=True, update=updateRest)
+    stay_low: bpy.props.BoolProperty(name="Keep Low", default=True, update=updateRest)
     merge_dist: bpy.props.FloatProperty(name="Merge distance - EXPERIMENTAL", default=0.0, min=0.0000, max=0.1,
                                         precision=PRECISION, unit="LENGTH", update=updateRest)
     # optimization and performance
@@ -1244,11 +1245,12 @@ def get_panels():  # convenience function for bot register and unregister functi
         ui.CAM_OPERATIONS_Panel,
         ui.CAM_OPERATION_PROPERTIES_Panel,
 
-        ui.CAM_MATERIAL_Panel,
+        
         
         #ui.CAM_AREA_Panel,
         ui.CAM_MOVEMENT_Panel,
         #ui.CAM_FEEDRATE_Panel,
+        ui.CAM_MATERIAL_Panel,
 
         ui.CAM_OPTIMISATION_Panel,
         ui.CAM_GCODE_Panel,

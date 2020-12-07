@@ -466,7 +466,7 @@ class CamChainAdd(bpy.types.Operator):
         s.cam_chains.add()
         chain = s.cam_chains[-1]
         s.cam_active_chain = len(s.cam_chains) - 1
-        chain.name = 'Chain_' + str(s.cam_active_chain + 1)
+        chain.name = 'Sequence_' + str(s.cam_active_chain + 1)
         chain.filename = chain.name
         chain.index = s.cam_active_chain
 
@@ -605,13 +605,18 @@ class CamOperationAdd(bpy.types.Operator):
 
         if s.objects.get('CAM_machine') is None:
              utils.addMachineAreaObject()
+
+        if(len(s.cam_cutting_tools) == 0):
+            #Add a cutting tool if there are none. 
+            bpy.ops.scene.cam_cutting_tool_add()
+        # So material is or was going to be separate? interesting... Perhaps I could adjust sequences to have their own material?
         # if len(s.cam_material)==0:
         #     s.cam_material.add()
 
         s.cam_operations.add()
         o = s.cam_operations[-1]
         s.cam_active_operation = len(s.cam_operations) - 1
-        o.name = 'Operation_' + str(s.cam_active_operation + 1)
+        o.name = 'Cut_' + str(s.cam_active_operation + 1)
         o.filename = o.name
         ob = bpy.context.active_object
         if ob is not None:
