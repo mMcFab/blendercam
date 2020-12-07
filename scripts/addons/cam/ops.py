@@ -34,6 +34,8 @@ import mathutils
 from mathutils import *
 import math
 
+from bpy_extras.io_utils import ExportHelper
+
 
 
 class threadCom:  # object passed to threads to read background process stdout info
@@ -279,7 +281,7 @@ class CamSliceObjects(bpy.types.Operator):
     """Slice a mesh object horizontally"""
     # warning, this is a separate and neglected feature, it's a mess - by now it just slices up the object.
     bl_idname = "object.cam_slice_objects"
-    bl_label = "Slice object - usefull for lasercut puzzles e.t.c."
+    bl_label = "Slice object - useful for lasercut puzzles e.t.c."
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -333,6 +335,14 @@ class PathExportChain(bpy.types.Operator):
     bl_label = "Export CAM paths in current chain as gcode"
     bl_options = {'REGISTER', 'UNDO'}
 
+    filename_ext = ".txt"
+
+    filter_glob: StringProperty(
+        default="*.txt",
+        options={'HIDDEN'},
+        maxlen=255,  # Max internal buffer length, longer would be clamped.
+    )
+
     def execute(self, context):
         s = bpy.context.scene
 
@@ -345,24 +355,33 @@ class PathExportChain(bpy.types.Operator):
         for o in chainops:
             # bpy.ops.object.calculate_cam_paths_background()
             meshes.append(bpy.data.objects["cam_path_{}".format(o.name)].data)
-        utils.exportGcodePath(chain.filename, meshes, chainops)
+        utils.exportGcodePath(self.filepath, meshes, chainops)
         return {'FINISHED'}
 
 
-class PathExport(bpy.types.Operator):
+#class PathExport(bpy.types.Operator):
+class PathExport(bpy.types.Operator, ExportHelper):
     """Export gcode. Can be used only when the path object is present"""
     bl_idname = "object.cam_export"
     bl_label = "Export operation gcode"
     bl_options = {'REGISTER', 'UNDO'}
+
+    filename_ext = ".txt"
+
+    filter_glob: StringProperty(
+        default="*.txt",
+        options={'HIDDEN'},
+        maxlen=255,  # Max internal buffer length, longer would be clamped.
+    )
 
     def execute(self, context):
 
         s = bpy.context.scene
         operation = s.cam_operations[s.cam_active_operation]
 
-        print("EXPORING", operation.filename, bpy.data.objects["cam_path_{}".format(operation.name)].data, operation)
+        print("EXPORTING", self.filepath, bpy.data.objects["cam_path_{}".format(operation.name)].data, operation)
 
-        utils.exportGcodePath(operation.filename, [bpy.data.objects["cam_path_{}".format(operation.name)].data], [operation])
+        utils.exportGcodePath(self.filepath, [bpy.data.objects["cam_path_{}".format(operation.name)].data], [operation])
         return {'FINISHED'}
 
 
@@ -616,6 +635,8 @@ class CamOperationCopy(bpy.types.Operator):
     def execute(self, context):
         # main(context)
         s = bpy.context.scene
+        if(len(s.cam_operations) < 1):
+            return {'FINISHED'}
 
         fixUnits()
 
@@ -746,7 +767,7 @@ class CamOrientationAdd(bpy.types.Operator):
 class CamBridgesAdd(bpy.types.Operator):
     """Add bridge objects to curve"""
     bl_idname = "scene.cam_bridges_add"
-    bl_label = "Add bridges"
+    bl_label = "Add Tabs"
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
@@ -1279,7 +1300,7 @@ class CamOffsetSilhouete(bpy.types.Operator):
         return {'FINISHED'}
 
 
-# Finds object silhouette, usefull for meshes, since with curves it's not needed.
+# Finds object silhouette, useful for meshes, since with curves it's not needed.
 class CamObjectSilhouete(bpy.types.Operator):
     """Object silhouete """
     bl_idname = "object.silhouete"
@@ -1337,7 +1358,9 @@ class CuttingToolAdd(bpy.types.Operator):
         o.cutter_static_id = (max_existing_static_id + 1)
         
         #print("New static ID ", o.cutter_static_id)
-
+        for op in bpy.context.scene.cam_operations:
+            #__init__.updateOperationValid(op, context)
+            op.extUpdateOperationValid()
         #o.filename = o.name
 
         return {'FINISHED'}
@@ -1356,8 +1379,10 @@ class CuttingToolCopy(bpy.types.Operator):
     def execute(self, context):
         # main(context)
         s = bpy.context.scene
+        if(len(s.cam_cutting_tools) < 1):
+            return {'FINISHED'}
 
-        s = bpy.context.scene
+        
         s.cam_cutting_tools.add()
         copyop = s.cam_cutting_tools[s.cam_active_cutting_tool]
         s.cam_active_cutting_tool += 1

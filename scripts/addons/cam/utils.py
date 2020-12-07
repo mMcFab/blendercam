@@ -2116,7 +2116,7 @@ def getContainer():
 def addBridge(x, y, rot, sizex, sizey):
 	bpy.ops.mesh.primitive_plane_add(size=sizey*2, calc_uvs=True, enter_editmode=False, align='WORLD', location=(0, 0, 0), rotation=(0, 0, 0))
 	b = bpy.context.active_object
-	b.name = 'bridge'
+	b.name = 'tab'
 	# b.show_name=True
 	b.dimensions.x = sizex
 	bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
@@ -2134,7 +2134,7 @@ def addBridge(x, y, rot, sizex, sizey):
 
 
 def addAutoBridges(o):
-	"""attempt to add auto bridges as set of curves"""
+	"""attempt to add auto tabs as set of curves"""
 	getOperationSources(o)
 
 	cutter_props = o.getOpCuttingTool()
@@ -2144,7 +2144,7 @@ def addAutoBridges(o):
 	#	return;
 	bridgecollectionname = o.bridges_collection_name
 	if bridgecollectionname == '' or bpy.data.collections.get(bridgecollectionname) == None:
-		bridgecollectionname = 'bridges_' + o.name
+		bridgecollectionname = 'tabs_' + o.name
 		bpy.data.collections.new(bridgecollectionname)
 		bpy.context.collection.children.link(bpy.data.collections[bridgecollectionname])
 	g = bpy.data.collections[bridgecollectionname]

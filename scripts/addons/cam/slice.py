@@ -19,7 +19,7 @@
 #
 # ***** END GPL LICENCE BLOCK *****
 
-# very simple slicing for 3d meshes, usefull for plywood cutting.
+# very simple slicing for 3d meshes, useful for plywood cutting.
 from cam import chunk, polygon_utils_cam
 import bpy
 
