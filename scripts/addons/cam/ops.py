@@ -350,7 +350,8 @@ class PathExportChain(bpy.types.Operator, ExportHelper):
 
         
         extension = '.tap'
-        m = bpy.context.scene.cam_machine
+        s = bpy.context.scene
+        m = s.cam_machine
         if m.post_processor == 'EMC':
             extension = '.ngc'
         elif m.post_processor == 'GRBL':
@@ -374,14 +375,20 @@ class PathExportChain(bpy.types.Operator, ExportHelper):
         self.filename_ext = extension
         self.filter_glob = "*" + extension
 
-        if not self.filepath:
-            blend_filepath = context.blend_data.filepath
-            if not blend_filepath:
-                blend_filepath = "untitled"
-            else:
-                blend_filepath = os.path.splitext(blend_filepath)[0]
+        # if not self.filepath:
+        #     blend_filepath = context.blend_data.filepath
+        #     if not blend_filepath:
+        #         blend_filepath = "untitled"
+        #     else:
+        #         blend_filepath = os.path.splitext(blend_filepath)[0]
 
-            self.filepath = blend_filepath + self.filename_ext
+        #     self.filepath = blend_filepath + self.filename_ext
+        blend_filepath = context.blend_data.filepath
+        if not blend_filepath:
+            blend_filepath = "untitled"
+        else:
+            blend_filepath = os.path.splitext(blend_filepath)[0]
+        self.filepath = blend_filepath + "_" + s.cam_chains[s.cam_active_chain].name + self.filename_ext
 
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
@@ -418,9 +425,9 @@ class PathExport(bpy.types.Operator, ExportHelper):
     def invoke(self, context, event):
         import os
 
-        
+        s = bpy.context.scene
+        m = s.cam_machine
         extension = '.tap'
-        m = bpy.context.scene.cam_machine
         if m.post_processor == 'EMC':
             extension = '.ngc'
         elif m.post_processor == 'GRBL':
@@ -444,14 +451,12 @@ class PathExport(bpy.types.Operator, ExportHelper):
         self.filename_ext = extension
         self.filter_glob = "*" + extension
 
-        if not self.filepath:
-            blend_filepath = context.blend_data.filepath
-            if not blend_filepath:
-                blend_filepath = "untitled"
-            else:
-                blend_filepath = os.path.splitext(blend_filepath)[0]
-
-            self.filepath = blend_filepath + self.filename_ext
+        blend_filepath = context.blend_data.filepath
+        if not blend_filepath:
+            blend_filepath = "untitled"
+        else:
+            blend_filepath = os.path.splitext(blend_filepath)[0]
+        self.filepath = blend_filepath + "_" + s.cam_operations[s.cam_active_operation].name + self.filename_ext
 
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
