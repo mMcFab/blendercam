@@ -12,9 +12,9 @@ Unfortunately, old tool pre-sets can't just be imported directly into my modifie
 
 I haven't tested this with OpenCAMLib yet, since I don't have the disk space free to install the tools to build it oops. I did update the code that seems to update it though
 
-A few more specific changes:
+A few more specific changes: 
 
-* "Distance between lines" is no longer a constant measurement has been replaced with "Tool Stepover", which is a percentage of the diameter of the active tool instead
+* "Distance between lines" is no longer a constant measurement and has been replaced with "Tool Stepover", which is a percentage of the diameter of the active tool instead
 * Lots of names have been changed for consistency with other programs and hopefully reducing confusion - eg. Chains -> Sequences, Bridges -> Tabs, etc
 * Menus that require an operation are now nested within the operations menu. Menu options have been moved around and re-organised to be grouped in a semi-logical order
 * Lots of labelling and layout.box() used to make it easier to scan for options. I find the subtle changes in grey by default very difficult to distinguish - boxes help a lot
