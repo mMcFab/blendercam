@@ -14,8 +14,14 @@ I haven't tested this with OpenCAMLib yet, since I don't have the disk space fre
 
 A few more specific changes:
 
-* "Distance between lines" is no longer a constant measurement has been replaced with "Tool Stepover", which is a percentage of the active tool diameter instead
+* "Distance between lines" is no longer a constant measurement has been replaced with "Tool Stepover", which is a percentage of the diameter of the active tool instead
 * Lots of names have been changed for consistency with other programs and hopefully reducing confusion - eg. Chains -> Sequences, Bridges -> Tabs, etc
+* Menus that require an operation are now nested within the operations menu. Menu options have been moved around and re-organised to be grouped in a semi-logical order
+* Lots of labelling and layout.box() used to make it easier to scan for options. I find the subtle changes in grey by default very difficult to distinguish - boxes help a lot
+* Names of tools, operations and sequences are validated and made unique whenever possible, since some things depend on the names being unique and consistent
+* Operation names are properly sync'd with chains/sequences, and are removed from a sequence when deleted
+* Process in background was hidden since it doesn't seem to work right now
+* Unused settings are hidden for now
 
 # Below is the original ReadMe, which I have kept since it has a bunch of useful links
 
