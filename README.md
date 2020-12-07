@@ -22,6 +22,7 @@ A few more specific changes:
 * Operation names are properly sync'd with chains/sequences, and are removed from a sequence when deleted
 * Process in background was hidden since it doesn't seem to work right now
 * Unused settings are hidden for now
+* Exporting now uses a file dialog instead of silently outputting the file into the Blender document directory. Default names are formatted as "\[document\]_\[operation/sequence\].extension
 
 # Below is the original ReadMe, which I have kept since it has a bunch of useful links
 
