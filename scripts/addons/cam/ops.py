@@ -305,9 +305,9 @@ def getChainOperations(chain):
 
 
 class PathsChain(bpy.types.Operator):
-    """calculate a chain and export the gcode alltogether. """
+    """calculate a sequence and export the gcode alltogether. """
     bl_idname = "object.calculate_cam_paths_chain"
-    bl_label = "Calculate CAM paths in current chain and export chain gcode"
+    bl_label = "Calculate CAM paths in current Sequence"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -332,9 +332,9 @@ class PathsChain(bpy.types.Operator):
 
 
 class PathExportChain(bpy.types.Operator, ExportHelper):
-    """calculate a chain and export the gcode alltogether. """
+    """calculate a sequence and export the gcode alltogether. """
     bl_idname = "object.cam_export_paths_chain"
-    bl_label = "Export CAM paths in current chain as gcode"
+    bl_label = "Export CAM Sequence G-Code"
     bl_options = {'REGISTER', 'UNDO'}
 
     filename_ext = ""
@@ -412,7 +412,7 @@ class PathExportChain(bpy.types.Operator, ExportHelper):
 class PathExport(bpy.types.Operator, ExportHelper):
     """Export gcode. Can be used only when the path object is present"""
     bl_idname = "object.cam_export"
-    bl_label = "Export operation gcode"
+    bl_label = "Export Operation G-Code"
     bl_options = {'REGISTER', 'UNDO'}
 
     filename_ext = ""
@@ -507,7 +507,7 @@ class CAMSimulate(bpy.types.Operator):
 
 
 class CAMSimulateChain(bpy.types.Operator):
-    """simulate CAM chain, compared to single op simulation just writes into one image and thus enables to see how ops work together."""
+    """simulate CAM sequence, compared to single op simulation just writes into one image and thus enables to see how ops work together."""
     bl_idname = "object.cam_simulate_chain"
     bl_label = "CAM simulation"
     bl_options = {'REGISTER', 'UNDO'}
