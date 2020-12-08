@@ -199,8 +199,8 @@ def getOperationSources(o):
 	elif o.geometry_source == 'COLLECTION':
 		collection = bpy.data.collections[o.collection_name]
 		o.objects = collection.objects
-	elif o.geometry_source == 'IMAGE':
-		o.use_exact = False
+	#elif o.geometry_source == 'IMAGE':
+	#	o.use_exact = False
 
 	if o.geometry_source == 'OBJECT' or o.geometry_source == 'COLLECTION':
 		o.onlycurves = True

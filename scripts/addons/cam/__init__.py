@@ -285,7 +285,7 @@ def operationValid(self, context):
         o.valid = False
         o.warnings = "Operation has no cutting tool selected"
 
-        o.use_exact = False
+        
     o.update_offsetimage_tag = True
     o.update_zbufferimage_tag = True
     print('validity ')
@@ -363,9 +363,19 @@ def updateExact(o, context):
     o.changed = True
     o.update_zbufferimage_tag = True
     o.update_offsetimage_tag = True
-    if o.use_exact and (o.strategy == 'WATERLINE' or o.strategy == 'POCKET' or o.inverse):
-        o.use_exact = False
+    #if o.use_exact and (o.strategy == 'WATERLINE' or o.strategy == 'POCKET' or o.inverse):
+    #    o.use_exact = False
 
+#Simple passthrough
+def setExact(o, val):
+    o["use_exact"] = val
+
+#This way the setting doesn't magically change if you switch to waterline. Fixes a personal headache. 
+def getExact(o):
+    if(o.strategy == 'WATERLINE' or o.strategy == 'POCKET' or o.inverse):
+        return False
+    else:
+        return o["use_exact"]
 
 def updateOpencamlib(o, context):
     print('update opencamlib ')
@@ -972,7 +982,7 @@ class camOperation(bpy.types.PropertyGroup):
                                          update=updateRest)
     use_exact: bpy.props.BoolProperty(name="Use Exact Mode",
                                       description="Exact mode allows greater precision, but is slower with complex meshes",
-                                      default=True, update=updateExact)
+                                      default=True, set=setExact, get=getExact)#update=updateExact)
     exact_subdivide_edges: bpy.props.BoolProperty(name="Auto subdivide long edges",
                                                   description="This can avoid some collision issues when importing CAD models",
                                                   default=False, update=updateExact)

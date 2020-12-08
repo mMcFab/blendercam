@@ -845,25 +845,29 @@ class CAM_OPTIMISATION_Panel(CAMButtonsPanel, bpy.types.Panel):
         if len(scene.cam_operations) > 0:
             ao = scene.cam_operations[scene.cam_active_operation]
             if ao.valid:
-                layout.prop(ao, 'optimize')
+                col = layout.column()
+                col.prop(ao, 'optimize')
                 if ao.optimize:
-                    layout.prop(ao, 'optimize_threshold')
+                    col.prop(ao, 'optimize_threshold')
                 if ao.geometry_source == 'OBJECT' or ao.geometry_source == 'COLLECTION':
-                    exclude_exact = ao.strategy in [ 'POCKET', 'CUTOUT', 'DRILL', 'PENCIL']
+                    #if(o.strategy == 'WATERLINE' or o.strategy == 'POCKET' or o.inverse):
+                    exclude_exact = (ao.strategy in [ 'POCKET', 'CUTOUT', 'DRILL', 'PENCIL', 'WATERLINE']) or ao.inverse
                     if not exclude_exact:
-                        layout.prop(ao, 'use_exact')
+                        row = layout.row()
+                        row.prop(ao, 'use_exact')
                         if ao.use_exact:
-                            layout.prop(ao, 'exact_subdivide_edges')
+                            row.prop(ao, 'exact_subdivide_edges')
                     if exclude_exact or not ao.use_exact:
-                        layout.prop(ao, 'pixsize')
-                        layout.prop(ao, 'imgres_limit')
+                        col = layout.column()
+                        col.prop(ao, 'pixsize')
+                        col.prop(ao, 'imgres_limit')
 
                         sx = ao.max.x - ao.min.x
                         sy = ao.max.y - ao.min.y
                         resx = int(sx / ao.pixsize)
                         resy = int(sy / ao.pixsize)
                         l = 'resolution: ' + str(resx) + ' x ' + str(resy)
-                        layout.label(text=l)
+                        col.label(text=l)
 
                 layout.prop(ao, 'simulation_detail')
                 layout.prop(ao, 'circle_detail')
