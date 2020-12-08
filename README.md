@@ -25,6 +25,11 @@ A few more specific changes:
 * Exporting now uses a file dialog instead of silently outputting the file into the Blender document directory. Default names are formatted as "\[document\]_\[operation/sequence\].extension
 * (fixed) and made sequence simulation use the full material bounds of all the operations it performs, rather than just the first
 
+# WARNING:
+The Marlin export sets the machine position to 0,0,0 at the start of the job and **disables software endstops** so that it can cut at negative Z - this means if you are not careful, you could damage your machine! Please test, check and simulate your exported g-code carefully before use! I won't be liable for any damage you may cause with the generated G-Codes
+You probably also need to home X and Y before a job, then move to the 0 position after (that usually being the bottom-left of the job, with the tool tip touching the workpiece)
+
+
 # Below is the original ReadMe, which I have kept since it has a bunch of useful links
 
 
