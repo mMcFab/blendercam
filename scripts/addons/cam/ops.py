@@ -322,10 +322,10 @@ class PathsChain(bpy.types.Operator):
             s.cam_active_operation = s.cam_operations.find(chainops[i].name)
             bpy.ops.object.calculate_cam_path()
 
-        for o in chainops:
+        #for o in chainops:
             # bpy.ops.object.calculate_cam_paths_background()
-            meshes.append(bpy.data.objects["cam_path_{}".format(o.name)].data)
-        utils.exportGcodePath(chain.filename, meshes, chainops)
+        #    meshes.append(bpy.data.objects["cam_path_{}".format(o.name)].data)
+        #utils.exportGcodePath(chain.filename, meshes, chainops)
         return {'FINISHED'}
 
 
