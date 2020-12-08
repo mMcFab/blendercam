@@ -82,7 +82,7 @@ class Creator(iso.Creator):
 		#self.write("M211 S0\nM121\n")
 		self.write("M211 S0\n")
 		self.write("G92 X0 Y0 Z0 ; Set the current position to 0, or the work origin. Will be an option Soon!\n")
-		self.rapid(z=self.free_movement_height)
+		
 
 
 	def program_end(self):
@@ -140,12 +140,14 @@ class Creator(iso.Creator):
 	
 	def tool_change(self, id):
 		#if id in self.tool_defn_params and self.output_comment_before_tool_change:
-			
+		
 		
 		if self.first_tool:
 			self.first_tool = False
+			
 			if self.output_comment_before_tool_change:
 				self.comment('Not changing tool since this is the first one')
+			self.rapid(z=self.free_movement_height)
 		else: 
 			if self.output_comment_before_tool_change:
 				self.comment('Automagic tool change thing made for Marlin!')
@@ -207,6 +209,7 @@ class Creator(iso.Creator):
 			# if self.output_g43_on_tool_change_line == False:
 				# self.write(self.SPACE() + 'G43')
 			# self.write(self.SPACE() + 'D' + str(id) + self.SPACE() + 'H' + str(id) + '\n')
+		
 		self.t = id
 		self.move_done_since_tool_change = False
 	
