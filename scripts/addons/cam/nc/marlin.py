@@ -5,6 +5,8 @@ import datetime
 import time
 import traceback
 
+import bpy
+
 now = datetime.datetime.now()
 
 #Gcode post-processor for Marlin Compatibility
@@ -50,7 +52,7 @@ class Creator(iso.Creator):
 	def FEED(self): return('G1')
 	def ARC_CW(self): return('G2')
 	def ARC_CCW(self): return('G3')
-	def DWELL(self, dwell): return('G4' + self.SPACE() + self.TIME() + (self.FORMAT_TIME().string(dwell)))
+	def DWELL(self, dwell): return('G4' + self.SPACE() + self.TIME() + (self.FORMAT_TIME().string(int(dwell * 1000))))
 	
 	
 	def STOP_OPTIONAL(self): return('M1')
@@ -80,6 +82,7 @@ class Creator(iso.Creator):
 		#self.write("M211 S0\nM121\n")
 		self.write("M211 S0\n")
 		self.write("G92 X0 Y0 Z0 ; Set the current position to 0, or the work origin. Will be an option Soon!\n")
+		self.rapid(z=self.free_movement_height)
 
 
 	def program_end(self):
@@ -89,7 +92,7 @@ class Creator(iso.Creator):
 			self.write(self.SPACE() + self.MACHINE_COORDINATES() + self.SPACE() + 'Z' + self.fmt.string(self.z_for_g53) + '\n')
 		self.write(self.SPACE() + self.PROGRAM_END() + '\n')
 
-		self.write(self.SPACE() + self.DWELL(2000) + '\n')
+		self.write(self.SPACE() + self.DWELL(bpy.context.scene.cam_machine.spindle_start_time) + '\n')
 		self.write(self.SPACE() + 'M211 S1' + '\n')
 		self.rapid(x=0, y=0)
 		self.write(self.SPACE() + 'M177 Job Complete' + '\n')
@@ -168,10 +171,10 @@ class Creator(iso.Creator):
 			
 			self.feed(x=None, y=None, z=self.free_movement_height)
 			self.write(self.SPACE() + 'M5 ;stop the spindle\n')
-			self.write(self.SPACE() + self.DWELL(2000) + ' ;dwell for 2 second to give some spin-down time\n')
+			self.write(self.SPACE() + self.DWELL(bpy.context.scene.cam_machine.spindle_start_time) + ' ;dwell for 2 second to give some spin-down time\n')
 			self.rapid(x=0, y=0, z=resting_z)
 			self.write(self.SPACE() + 'M1 Change Tool + Click... ;Await user confirmation\n')
-			self.write(self.SPACE() + self.DWELL(1000) + ' ;dwell for 1 second to give some user escape time\n')
+			self.write(self.SPACE() + self.DWELL(1) + ' ;dwell for 1 second to give some user escape time\n')
 			self.rapid(x=None, y=None, z=self.free_movement_height)
 			#Shorter tools make part go lower. Shift_z is additive. eg, new tool is shorter, shift_z must be negative small - big = negative
 			#self.shift_z += ([new tool height] - [old tool height])
