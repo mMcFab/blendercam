@@ -558,7 +558,7 @@ class CamChainAdd(bpy.types.Operator):
         chain.name = 'Sequence_' + str(s.cam_active_chain + 1)
         chain.filename = chain.name
         chain.index = s.cam_active_chain
-        chain.validateChainName()
+        #chain.validateChainName()
         return {'FINISHED'}
 
 
@@ -717,7 +717,7 @@ class CamOperationAdd(bpy.types.Operator):
             minx, miny, minz, maxx, maxy, maxz = utils.getBoundsWorldspace([ob])
             o.minz = minz
 
-        o.validateOperationName()
+        #o.validateOperationName()
 
         return {'FINISHED'}
 
@@ -769,7 +769,7 @@ class CamOperationCopy(bpy.types.Operator):
             o.name = o.name + '_copy'
             o.filename = o.filename + '_copy'
 
-        o.validateOperationName()
+        #o.validateOperationName()
 
         return {'FINISHED'}
 
@@ -1478,7 +1478,7 @@ class CuttingToolAdd(bpy.types.Operator):
         o.cutter_name = 'Tool_' + str(o.cutter_id)
         o.cutter_static_id = (max_existing_static_id + 1)
         
-        o.validateToolName()
+        #o.validateToolName()
         #print("New static ID ", o.cutter_static_id)
         for op in bpy.context.scene.cam_operations:
             #__init__.updateOperationValid(op, context)
@@ -1531,7 +1531,7 @@ class CuttingToolCopy(bpy.types.Operator):
         else:
             o.cutter_name = o.cutter_name + '_copy'
 
-        o.validateToolName()
+        #o.validateToolName()
 
         return {'FINISHED'}
 
