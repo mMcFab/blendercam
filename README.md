@@ -17,7 +17,7 @@ A few more specific changes:
 * "Distance between lines" is no longer a constant measurement and has been replaced with "Tool Stepover", which is a percentage of the diameter of the active tool instead
 * Lots of names have been changed for consistency with other programs and hopefully reducing confusion - eg. Chains -> Sequences, Bridges -> Tabs, etc
 * Menus that require an operation are now nested within the operations menu. Menu options have been moved around and re-organised to be grouped in a semi-logical order
-* Lots of labelling and layout.box() used to make it easier to scan for options. I find the subtle changes in grey that Blender uses by default makes very difficult to distinguish when one set of options ends and another set starts - boxes help a lot
+* Lots of labelling and layout.box() used to make it easier to scan for options. The subtle changes in grey that Blender uses by default make it very difficult for me to distinguish when one set of options ends and another set starts - boxes help a lot
 * Names of tools, operations and sequences are validated and made unique whenever possible, since some things depend on the names being unique and consistent. 
 * Operation names are properly sync'd with chains/sequences, and are removed from a sequence when deleted. This may require you to "rename" a sequence or operation to the same name for it to prepare the correct things to work properly if your chain/operation was created in a different/earlier version of BlenderCam
 * Process in background was hidden since it doesn't seem to work right now
