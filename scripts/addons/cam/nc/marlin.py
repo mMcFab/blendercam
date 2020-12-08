@@ -76,8 +76,9 @@ class Creator(iso.Creator):
 			self.write( ('; (Created with Marlin Cutter Radius Compensation post processor ' + str(now.strftime("%Y/%m/%d %H:%M")) + ')' + '\n') )
 		self.first_tool = True
 
-		self.comment('Disabling endstops to allow -Z! Please be super careful!')
-		self.write("M211 S0\nM121\n")
+		self.comment('Disabling soft endstops to allow -Z! Please be super careful!')
+		#self.write("M211 S0\nM121\n")
+		self.write("M211 S0")
 		self.write("G92 X0 Y0 Z0 ; Set the current position to 0, or the work origin. Will be an option Soon!\n")
 
 
