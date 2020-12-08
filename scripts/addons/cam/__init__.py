@@ -180,8 +180,8 @@ class machineSettings(bpy.types.PropertyGroup):
     spindle_default: bpy.props.FloatProperty(name="Spindle Default RPM", default=15000, min=0.00001, max=320000,
                                              precision=1)
     spindle_start_time: bpy.props.FloatProperty(name="Spindle Starup Time",
-                                                description='Wait for the spindle to start spinning before starting the feeds , in seconds',
-                                                default=0, min=0.0000, max=320000, precision=1)
+                                                description='Wait for the spindle to start spinning before starting the feeds, in seconds',
+                                                default=2, min=0.0000, max=320000, precision=1)
 
     axis4: bpy.props.BoolProperty(name="#4th axis", description="Machine has 4th axis", default=0)
     axis5: bpy.props.BoolProperty(name="#5th axis", description="Machine has 5th axis", default=0)
