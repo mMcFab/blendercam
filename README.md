@@ -25,6 +25,10 @@ A few more specific changes:
 * Exporting now uses a file dialog instead of silently outputting the file into the Blender document directory. Default names are formatted as "\[document\]_\[operation/sequence\].extension
 * (fixed) and made sequence simulation use the full material bounds of all the operations it performs, rather than just the first
 
+
+Known Issues
+* I messed up and now renames cause infinite recursion ugh
+
 # Below is the original ReadMe, which I have kept since it has a bunch of useful links
 
 
