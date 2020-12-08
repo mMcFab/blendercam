@@ -1241,24 +1241,26 @@ def exportGcodePath(filename, vertslist, operations):
 			c.output_g43_on_tool_change_line = m.output_g43_on_tool_change
 
 		c.file_open(filename)
-
+		c.comment('G-code generated with BlenderCAM and NC library')
 		# unit system correction
 		###############
+		
 		if s.unit_settings.system == 'METRIC':
 			c.metric()
 		elif s.unit_settings.system == 'IMPERIAL':
 			c.imperial()
-
-		# start program
-		c.program_begin(0, filename)
-		c.flush_nc()
-		c.comment('G-code generated with BlenderCAM and NC library')
 		# absolute coordinates
 		c.absolute()
 
 		# work-plane, by now always xy,
 		c.set_plane(0)
 		c.flush_nc()
+
+		# start program
+		c.program_begin(0, filename)
+		c.flush_nc()
+		
+		
 
 		return c
 
