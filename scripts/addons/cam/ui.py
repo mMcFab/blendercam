@@ -319,6 +319,8 @@ class CAM_OPERATIONS_Panel(CAMButtonsPanel, bpy.types.Panel):
                                 row.operator("object.cam_simulate", text="Simulate")
                                 row.operator("object.cam_export", text="Export gcode")
                         
+                        
+                        
                         #ao = scene.cam_operations[scene.cam_active_operation]
 
                     else:
@@ -350,7 +352,8 @@ class CAM_OPERATIONS_Panel(CAMButtonsPanel, bpy.types.Panel):
                             col.label(text='Chipload: ~' + strInUnits(ao.chipload, 4) + ' / tooth')
                 #sub = layout.column()
                 #sub.active = not ao.computing
-
+                if len(scene.cam_chains) > 0 and scene.cam_active_chain > -1:
+                    layout.operator("scene.cam_chain_operation_add", icon='ADD', text="Add to '" + scene.cam_chains[scene.cam_active_chain].name + "'")
                 #export_box = sub.box()
 
                 

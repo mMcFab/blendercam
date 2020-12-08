@@ -596,7 +596,7 @@ class CamChainOperationAdd(bpy.types.Operator):
         #s = bpy.context.scene
         # s.chaindata[chain.index].remove(chain.active_operation+1,s.cam_operations[s.cam_active_operation])
         chain.operations.add()
-        chain.active_operation += 1
+        chain.active_operation = len(chain.operations) - 1
         #chain.operations[-1].operation = s.cam_operations[s.cam_active_operation]
         #chain.operations[-1].name = chain.operations[-1].operation.name
         chain.operations[-1].name = s.cam_operations[s.cam_active_operation].name
