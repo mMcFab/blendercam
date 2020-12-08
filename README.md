@@ -18,16 +18,12 @@ A few more specific changes:
 * Lots of names have been changed for consistency with other programs and hopefully reducing confusion - eg. Chains -> Sequences, Bridges -> Tabs, etc
 * Menus that require an operation are now nested within the operations menu. Menu options have been moved around and re-organised to be grouped in a semi-logical order
 * Lots of labelling and layout.box() used to make it easier to scan for options. I find the subtle changes in grey that Blender uses by default makes very difficult to distinguish when one set of options ends and another set starts - boxes help a lot
-* Names of tools, operations and sequences are validated and made unique whenever possible, since some things depend on the names being unique and consistent
+* Names of tools, operations and sequences are validated and made unique whenever possible, since some things depend on the names being unique and consistent. This may require you to "rename" a sequence or operation to the same name for it to prepare the correct things to work properly after
 * Operation names are properly sync'd with chains/sequences, and are removed from a sequence when deleted
 * Process in background was hidden since it doesn't seem to work right now
 * Unused settings are hidden for now
 * Exporting now uses a file dialog instead of silently outputting the file into the Blender document directory. Default names are formatted as "\[document\]_\[operation/sequence\].extension
 * (fixed) and made sequence simulation use the full material bounds of all the operations it performs, rather than just the first
-
-
-Known Issues
-* I messed up and now renames cause infinite recursion ugh
 
 # Below is the original ReadMe, which I have kept since it has a bunch of useful links
 
