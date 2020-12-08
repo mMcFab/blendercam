@@ -27,7 +27,11 @@ class Creator(iso.Creator):
 		self.free_movement_height = 200
 		self.current_tool_definition = None
 
-	def PROGRAM_END(self):	return('M5')
+	def PROGRAM_END(self):	
+		#G0 Z' + str(self.free_movement_height) + '\nM5\nG4 S2\nM211 S0\nG0 X0 Y0
+		#self.feed(z=self.free_movement_height)
+		
+		return('M5')
 	#optimize
 	
 	def SPACE_STR(self): return(' ')
@@ -72,6 +76,41 @@ class Creator(iso.Creator):
 			self.write( ('; (Created with Marlin Cutter Radius Compensation post processor ' + str(now.strftime("%Y/%m/%d %H:%M")) + ')' + '\n') )
 		self.first_tool = True
 
+		self.comment('Disabling endstops to allow -Z! Please be super careful!')
+		self.write("M211 S0\nM121\n")
+		self.write("G92 X0 Y0 Z0 ; Set the current position to 0, or the work origin. Will be an option Soon!\n")
+
+
+	def program_end(self):
+		self.feed(z=self.free_movement_height)
+
+		if self.z_for_g53 != None:
+			self.write(self.SPACE() + self.MACHINE_COORDINATES() + self.SPACE() + 'Z' + self.fmt.string(self.z_for_g53) + '\n')
+		self.write(self.SPACE() + self.PROGRAM_END() + '\n')
+
+		self.write(self.SPACE() + self.DWELL(2000) + '\n')
+		self.write(self.SPACE() + 'M211 S1' + '\n')
+		self.rapid(x=0, y=0)
+		self.write(self.SPACE() + 'M177 Job Complete' + '\n')
+
+		if self.temp_file_to_append_on_close != None:
+			f_in = open(self.temp_file_to_append_on_close, 'r')
+			while (True):
+				line = f_in.readline()
+				if (len(line) == 0) : break
+				self.write(line)
+			f_in.close()
+
+		self.file_close()
+
+		if self.output_block_numbers:
+			# number every line of the file afterwards
+			self.number_file(self.filename)
+
+			for f in self.subroutine_files:
+				self.number_file(f)
+
+		
 
 
 ############################################################################
@@ -128,10 +167,10 @@ class Creator(iso.Creator):
 			
 			self.feed(x=None, y=None, z=self.free_movement_height)
 			self.write(self.SPACE() + 'M5 ;stop the spindle\n')
-			self.write(self.SPACE() + 'G4 S2 ;dwell for 2 second to give some spin-down time\n')
+			self.write(self.SPACE() + self.DWELL(2000) + ' ;dwell for 2 second to give some spin-down time\n')
 			self.rapid(x=0, y=0, z=resting_z)
 			self.write(self.SPACE() + 'M1 Change Tool + Click... ;Await user confirmation\n')
-			self.write(self.SPACE() + 'G4 S1 ;dwell for 1 second to give some user escape time\n')
+			self.write(self.SPACE() + self.DWELL(1000) + ' ;dwell for 1 second to give some user escape time\n')
 			self.rapid(x=None, y=None, z=self.free_movement_height)
 			#Shorter tools make part go lower. Shift_z is additive. eg, new tool is shorter, shift_z must be negative small - big = negative
 			#self.shift_z += ([new tool height] - [old tool height])
