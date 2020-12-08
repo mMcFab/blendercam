@@ -28,6 +28,7 @@ class Creator(iso.Creator):
 		self.first_tool = True
 		self.free_movement_height = 200
 		self.current_tool_definition = None
+		#self.last_move_was_rapid = False
 
 	def PROGRAM_END(self):	
 		#G0 Z' + str(self.free_movement_height) + '\nM5\nG4 S2\nM211 S0\nG0 X0 Y0
@@ -115,7 +116,155 @@ class Creator(iso.Creator):
 				self.number_file(f)
 
 		
+	def rapid(self, x=None, y=None, z=None, a=None, b=None, c=None ):
+		#self.last_move_was_rapid = True
+		if self.same_xyz(x, y, z, a, b, c): return
+		#if(x is None and y is None and z is None and a is None and b is None and c is None): return
+		if(self.f.str and self.f.str != self.f.previous):
+			#print("wuhuh")
+			#print(self.f.str)
+			self.write(self.SPACE() + self.RAPID())
+			
+			self.write_feedrate()
+			self.write('\n')
+		
+		self.on_move()
 
+		if self.g0123_modal:
+			if self.prev_g0123 != self.RAPID():
+				self.write(self.SPACE() + self.RAPID())
+				self.prev_g0123 = self.RAPID()
+		else:
+			self.write(self.SPACE() + self.RAPID())
+		self.write_preps()
+		if (x != None):
+			if (self.absolute_flag ):
+				self.write(self.SPACE() + self.X() + (self.fmt.string(x + self.shift_x)))
+			else:
+				dx = x - self.x
+				self.write(self.SPACE() + self.X() + (self.fmt.string(dx)))
+			self.x = x
+		if (y != None):
+			if (self.absolute_flag ):
+				self.write(self.SPACE() + self.Y() + (self.fmt.string(y + self.shift_y)))
+			else:
+				dy = y - self.y
+				self.write(self.SPACE() + self.Y() + (self.fmt.string(dy)))
+
+			self.y = y
+		if (z != None):
+			if (self.absolute_flag ):
+				self.write(self.SPACE() + self.Z() + (self.fmt.string(z + self.shift_z)))
+			else:
+				dz = z - self.z
+				self.write(self.SPACE() + self.Z() + (self.fmt.string(dz)))
+
+			self.z = z
+
+		if (a != None):
+			if (self.absolute_flag ):
+				self.write(self.SPACE() + self.A() + (self.fmt.string(a)))
+			else:
+				da = a - self.a
+				self.write(self.SPACE() + self.A() + (self.fmt.string(da)))
+			self.a = a
+
+		if (b != None):
+			if (self.absolute_flag ):
+				self.write(self.SPACE() + self.B() + (self.fmt.string(b)))
+			else:
+				db = b - self.b
+				self.write(self.SPACE() + self.B() + (self.fmt.string(db)))
+			self.b = b
+
+		if (c != None):
+			if (self.absolute_flag ):
+				self.write(self.SPACE() + self.C() + (self.fmt.string(c)))
+			else:
+				dc = c - self.c
+				self.write(self.SPACE() + self.C() + (self.fmt.string(dc)))
+			self.c = c
+		
+		
+		self.write_spindle()
+		self.write_misc()
+		self.write('\n')
+	# def rapid(self, x=None, y=None, z=None, a=None, b=None, c=None ):
+	#  	self.write("penis\n")
+	#  	iso.Creator.rapid(self, x=None, y=None, z=None, a=None, b=None, c=None)
+	def feed(self, x=None, y=None, z=None, a=None, b=None, c=None):
+		if self.same_xyz(x, y, z, a, b, c): return
+
+		if(self.f.str and self.f.str != self.f.previous):
+			#print("wuhuh")
+			#print(self.f.str)
+			self.write(self.SPACE() + self.FEED())
+			
+			self.write_feedrate()
+			self.write('\n')
+
+		self.on_move()
+		if self.g0123_modal:
+			if self.prev_g0123 != self.FEED():
+				self.writem([self.SPACE() , self.FEED()])
+				self.prev_g0123 = self.FEED()
+		else:
+			self.write(self.SPACE() + self.FEED())
+		self.write_preps()
+		dx = dy = dz = 0
+		if (x != None):
+			dx = x - self.x
+			if (self.absolute_flag ):
+				self.writem([self.SPACE() , self.X() , (self.fmt.string(x + self.shift_x))])
+			else:
+				self.writem([self.SPACE() , self.X() , (self.fmt.string(dx))])
+			self.x = x
+		if (y != None):
+			dy = y - self.y
+			if (self.absolute_flag ):
+				self.writem([self.SPACE() , self.Y() , (self.fmt.string(y + self.shift_y))])
+			else:
+				self.writem([self.SPACE() , self.Y() , (self.fmt.string(dy))])
+
+			self.y = y
+		if (z != None):
+			dz = z - self.z
+			if (self.absolute_flag ):
+				self.writem([self.SPACE() , self.Z() , (self.fmt.string(z + self.shift_z))])
+			else:
+				self.writem([self.SPACE() , self.Z() , (self.fmt.string(dz))])
+
+			self.z = z
+
+		if (a != None):
+			da = a - self.a
+			if (self.absolute_flag ):
+				self.writem([self.SPACE() , self.A() , (self.fmt.string(a))])
+			else:
+				self.writem([self.SPACE() , self.A() , (self.fmt.string(da))])
+			self.a = a
+
+		if (b != None):
+			db = b - self.b
+			if (self.absolute_flag ):
+				self.writem([self.SPACE() , self.B() , (self.fmt.string(b))])
+			else:
+				self.writem([self.SPACE() , self.B() , (self.fmt.string(db))])
+			self.b = b
+
+		if (c != None):
+			dc = c - self.c
+			if (self.absolute_flag ):
+				self.writem([self.SPACE() , self.C() , (self.fmt.string(c))])
+			else:
+				self.writem([self.SPACE() , self.C() , (self.fmt.string(dc))])
+			self.c = c
+
+		if (self.fhv) : self.calc_feedrate_hv(math.sqrt(dx*dx+dy*dy), math.fabs(dz))
+		self.write_feedrate()
+		self.write_spindle()
+		self.write_misc()
+		self.write('\n')
 
 ############################################################################
 ##  Settings
@@ -147,6 +296,7 @@ class Creator(iso.Creator):
 			
 			if self.output_comment_before_tool_change:
 				self.comment('Not changing tool since this is the first one')
+			#self.feedrate()
 			self.rapid(z=self.free_movement_height)
 		else: 
 			if self.output_comment_before_tool_change:
