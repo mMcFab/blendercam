@@ -95,6 +95,7 @@ class CAM_MACHINE_Panel(CAMButtonsPanel, bpy.types.Panel):
             row = column.row(align=True)
             row.prop(ao, 'feedrate_min')
             row.prop(ao, 'feedrate_max')
+            box.prop(ao, 'travel_speed')
             #Spindle and feedrate defaults are not actually used currently, so just need removing anyway
             #column.prop(ao,
             #            'feedrate_default')  # TODO: spindle default and feedrate default should become part of the cutter definition...

@@ -1277,9 +1277,24 @@ def exportGcodePath(filename, vertslist, operations):
 			for aline in lines:
 				c.write(aline + '\n')
 
+		m = bpy.context.scene.cam_machine
+
+		millfeedrate = min(o.feedrate, m.feedrate_max)
+
+		millfeedrate = unitcorr * max(millfeedrate, m.feedrate_min)
+		plungefeedrate = millfeedrate * o.plunge_feedrate / 100
+		freefeedrate = m.travel_speed * unitcorr
+
+		fadjust = False
+		if o.do_simulation_feedrate and mesh.shape_keys != None and mesh.shape_keys.key_blocks.find('feedrates') != -1:
+			shapek = mesh.shape_keys.key_blocks['feedrates']
+
+			fadjust = True
+		
 		free_movement_height = o.free_movement_height  # o.max.z+
 		c.free_movement_height = free_movement_height * unitcorr
-		
+		c.feedrate(freefeedrate)
+
 		mesh = vertslist[i]
 		verts = mesh.vertices[:]
 		if o.machine_axes != '3':
@@ -1320,18 +1335,7 @@ def exportGcodePath(filename, vertslist, operations):
 		# dhull c.feedrate(unitcorr*o.feedrate)
 
 		# commands=[]
-		m = bpy.context.scene.cam_machine
-
-		millfeedrate = min(o.feedrate, m.feedrate_max)
-
-		millfeedrate = unitcorr * max(millfeedrate, m.feedrate_min)
-		plungefeedrate = millfeedrate * o.plunge_feedrate / 100
-		freefeedrate = m.feedrate_max * unitcorr
-		fadjust = False
-		if o.do_simulation_feedrate and mesh.shape_keys != None and mesh.shape_keys.key_blocks.find('feedrates') != -1:
-			shapek = mesh.shape_keys.key_blocks['feedrates']
-
-			fadjust = True
+		
 
 		if m.use_position_definitions:	# dhull
 			last = Vector((m.starting_position.x, m.starting_position.y, m.starting_position.z))

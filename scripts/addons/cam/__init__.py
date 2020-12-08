@@ -164,11 +164,14 @@ class machineSettings(bpy.types.PropertyGroup):
                                                 precision=PRECISION, subtype="XYZ", update=updateMachine)#
 
     feedrate_min: bpy.props.FloatProperty(name="Feedrate Min", default=0.0, min=0.00001, max=320000,
-                                          precision=PRECISION, unit='LENGTH')
+                                          precision=PRECISION, unit='LENGTH', description="In Meters per Minute")
     feedrate_max: bpy.props.FloatProperty(name="Feedrate Max", default=2, min=0.00001, max=320000,
-                                          precision=PRECISION, unit='LENGTH')
-    feedrate_default: bpy.props.FloatProperty(name="Feedrate default /min", default=1.5, min=0.00001, max=320000,
-                                              precision=PRECISION, unit='LENGTH')
+                                          precision=PRECISION, unit='LENGTH', description="In Meters per Minute")
+    feedrate_default: bpy.props.FloatProperty(name="Feedrate Default", default=1.5, min=0.00001, max=320000,
+                                              precision=PRECISION, unit='LENGTH', description="In Meters per Minute")
+
+    travel_speed: bpy.props.FloatProperty(name="Travel Speed", default=2, min=0.00001, max=320000,
+                                              precision=PRECISION, unit='LENGTH', description="In Meters per Minute")
     
     
     # UNSUPPORTED:
@@ -1308,6 +1311,7 @@ class AddPresetCamMachine(bl_operators.presets.AddPresetBase, Operator):
         "d.feedrate_min",
         "d.feedrate_max",
         "d.feedrate_default",
+        "d.travel_speed", 
         "d.spindle_min",
         "d.spindle_max",
         "d.spindle_default",
