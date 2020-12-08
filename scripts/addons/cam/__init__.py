@@ -595,6 +595,10 @@ def updateCamOperationName(o, context):
             if(opRef.name == o.old_name):
                 opRef.name = o.name
 
+    path = bpy.data.objects.get('cam_path_{}'.format(o.old_name))
+    if path:
+        path.name = "cam_path_" + o.name
+
     o.old_name = o.name
     
     updateRest(o, context)

@@ -809,6 +809,13 @@ class CamOperationRemove(bpy.types.Operator):
                     continue
                 index += 1
 
+        bpy.ops.object.select_all(action='DESELECT')
+        path = bpy.data.objects.get('cam_path_{}'.format(ao.name))
+        if path:
+            path.select_set(state=True)
+            bpy.ops.object.delete()
+
+
         scene.cam_operations.remove(scene.cam_active_operation)
         if scene.cam_active_operation > 0:
             scene.cam_active_operation -= 1
