@@ -304,7 +304,9 @@ def getBounds(o):
 		# o.max.x=min(o.min.x+m.working_area.x,o.max.x)
 		# o.max.y=min(o.min.y+m.working_area.y,o.max.y)
 		# o.max.z=min(o.min.z+m.working_area.z,o.max.z)
-		o.warnings += 'Operation exceeds your machine limits\n'
+		wstr = 'Operation exceeds your machine limits\n'
+		if wstr not in o.warnings:
+			o.warnings += wstr
 
 
 # progress (o.min.x,o.min.y,o.min.z,o.max.x,o.max.y,o.max.z)
@@ -2480,7 +2482,9 @@ def strategy_curve(o):
 	pathSamples = []
 	getOperationSources(o)
 	if not o.onlycurves:
-		o.warnings += 'at least one of assigned objects is not a curve\n'
+		wstr = 'at least one of assigned objects is not a curve\n'
+		if wstr not in o.warnings:
+			o.warnings += wstr
 	# ob=bpy.data.objects[o.object_name]
 	for ob in o.objects:
 		pathSamples.extend(curveToChunks(ob))
@@ -2868,7 +2872,9 @@ def strategy_medial_axis(o):
 		# angle = o.cutter_tip_angle
 		maxdepth = cutter_props.cutter_diameter / 2
 	else:
-		o.warnings += 'Only Ballnose, Ball and V-carve cutters\n are supported'
+		wstr = 'Only Ballnose, Ball and V-carve cutters\nare supported\n'
+		if wstr not in o.warnings:
+			o.warnings += wstr
 		return
 	# remember resolutions of curves, to refine them,
 	# otherwise medial axis computation yields too many branches in curved parts

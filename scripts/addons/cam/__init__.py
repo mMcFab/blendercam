@@ -71,7 +71,8 @@ def updateMaterial(self, context):
 def updateOperation(self, context):
     scene = context.scene
     ao = scene.cam_operations[scene.cam_active_operation]
-
+    ao.warnings = ''
+    
     if ao.hide_all_others == True:
         for _ao in scene.cam_operations:
             if _ao.path_object_name in bpy.data.objects:
