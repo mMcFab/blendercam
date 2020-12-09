@@ -65,11 +65,13 @@ SHAPELY = True
 
 
 def positionObject(operation):
-	ob = bpy.data.objects[operation.object_name]
-	minx, miny, minz, maxx, maxy, maxz = getBoundsWorldspace([ob], operation.use_modifiers)
-	ob.location.x -= minx
-	ob.location.y -= miny
-	ob.location.z -= maxz
+	#ob = bpy.data.objects[operation.object_name]
+	getOperationSources(operation)
+	minx, miny, minz, maxx, maxy, maxz = getBoundsWorldspace(operation.objects, operation.use_modifiers)
+	for ob in operation.objects:
+		ob.location.x -= minx
+		ob.location.y -= miny
+		ob.location.z -= maxz
 
 
 def getBoundsWorldspace(obs, use_modifiers=False):
@@ -357,6 +359,7 @@ def samplePathLow(o, ch1, ch2, dosample):
 					o.update_bullet_collision_tag = False
 
 				cutterdepth = o.cutter_shape.dimensions.z / 2
+				
 				for p in bpath.points:
 					z = getSampleBullet(o.cutter_shape, p[0], p[1], cutterdepth, 1, o.minz)
 					if z > p[2]:
@@ -378,6 +381,14 @@ def sampleChunks(o, pathSamples, layers):
 	minx, miny, minz, maxx, maxy, maxz = o.min.x, o.min.y, o.min.z, o.max.x, o.max.y, o.max.z
 	getAmbient(o)
 	cutter_props = o.getOpCuttingTool()
+
+	#print("Some mins")
+	#print(o.min.x)
+	#print(o.min.y)
+	#print(o.material_radius_around_model)
+	#ok this shift may work on one object, but it doesn't solve the fundamental issue - the rigid body is in the wrong place. 
+	sample_shift_x = 0#o.min.x + o.material_radius_around_model
+	sample_shift_y = 0#o.min.y + o.material_radius_around_model
 
 	if o.use_exact:	 # prepare collision world
 		if o.use_opencamlib:
@@ -462,14 +473,19 @@ def sampleChunks(o, pathSamples, layers):
 				####sampling
 				elif o.use_exact and not o.use_opencamlib:
 
-					if lastsample != None:	# this is an optimalization, search only for near depths to the last sample. Saves about 30% of sampling time.
-						z = getSampleBullet(cutter, x, y, cutterdepth, 1,
+					if lastsample != None:	# this is an optimization, search only for near depths to the last sample. Saves about 30% of sampling time.
+						z = getSampleBullet(cutter, x-sample_shift_x, y-sample_shift_y, cutterdepth, 1,
 											lastsample[2] - o.dist_along_paths)	 # first try to the last sample
 						if z < minz - 1:
-							z = getSampleBullet(cutter, x, y, cutterdepth, lastsample[2] - o.dist_along_paths, minz)
+							z = getSampleBullet(cutter, x-sample_shift_x, y-sample_shift_y, cutterdepth, lastsample[2] - o.dist_along_paths, minz)
 					else:
-						z = getSampleBullet(cutter, x, y, cutterdepth, 1, minz)
+						z = getSampleBullet(cutter, x-sample_shift_x, y-sample_shift_y, cutterdepth, 1, minz)
 
+					# Okay, now that we have adjusted for object x+y, we also need to account for Z. I think that is just shifting z by the object max z?
+					# I assume the system clamps properly after 
+					#Okay the shift works, but not considers the object properly
+					#z -= 0.001
+					z += o.max.z
 				# print(z)
 				# here we have
 				else:
