@@ -203,7 +203,13 @@ def prepareBulletCollision(o):
         collisionob.location = collisionob.location * BULLET_SCALE
         bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
         bpy.context.view_layer.objects.active = collisionob
-        active_collection.objects.unlink(collisionob)
+        
+        for collection in collisionob.users_collection:
+            collection.objects.unlink(collisionob)
+        
+        #if collisionob in active_collection.objects:
+        #    active_collection.objects.unlink(collisionob)
+        
         #bpy.ops.collection.objects_remove(collection=active_collection_name)
 
 
