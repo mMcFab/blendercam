@@ -262,6 +262,10 @@ def cleanupBulletCollision(o):
                                      snap_align=False, snap_normal=(0, 0, 0), texture_space=False,
                                      release_confirm=False)
             ob.location = ob.location / BULLET_SCALE
+    
+    s = bpy.context.scene
+    for ob in s.rigidbody_world.collection.objects:
+        s.rigidbody_world.collection.objects.unlink(ob)
 
 
 def getSampleBullet(cutter, x, y, radius, startz, endz):
