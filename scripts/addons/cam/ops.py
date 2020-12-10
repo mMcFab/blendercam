@@ -65,7 +65,7 @@ class CAMPositionObject(bpy.types.Operator):
     def execute(self, context):
         s = bpy.context.scene
         operation = s.cam_operations[s.cam_active_operation]
-        if operation.object_name in bpy.data.objects:
+        if operation.object_name is not None:#in bpy.data.objects:
             utils.positionObject(operation)
         else:
             print('no object assigned')
@@ -714,6 +714,7 @@ class CamOperationAdd(bpy.types.Operator):
         ob = bpy.context.active_object
         if ob is not None:
             o.object_name = ob.name
+            o.object = ob
             minx, miny, minz, maxx, maxy, maxz = utils.getBoundsWorldspace([ob])
             o.minz = minz
 

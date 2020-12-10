@@ -618,14 +618,16 @@ class CAM_OPERATION_PROPERTIES_Panel(CAMButtonsPanel, bpy.types.Panel):
             column.prop(ao, 'geometry_source')
             if not ao.strategy == 'CURVE':
                 if ao.geometry_source == 'OBJECT':
-                    column.prop_search(ao, "object_name", bpy.data, "objects")
+                    #column.prop_search(ao, "object_name", bpy.data, "objects")
+                    column.prop_search(ao, "object", bpy.data, "objects")
                 elif ao.geometry_source == 'COLLECTION':
                     column.prop_search(ao, "collection_name", bpy.data, "collections")
                 else:
                     column.prop_search(ao, "source_image_name", bpy.data, "images")
             else:
                 if ao.geometry_source == 'OBJECT':
-                    column.prop_search(ao, "object_name", bpy.data, "objects")
+                    #column.prop_search(ao, "object_name", bpy.data, "objects")
+                    column.prop_search(ao, "object", bpy.data, "objects")
                 elif ao.geometry_source == 'COLLECTION':
                     column.prop_search(ao, "collection_name", bpy.data, "collections")
 

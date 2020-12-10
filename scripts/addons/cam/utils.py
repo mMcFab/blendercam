@@ -196,7 +196,7 @@ def getSplineBounds(ob, curve):
 def getOperationSources(o):
 	if o.geometry_source == 'OBJECT':
 		# bpy.ops.object.select_all(action='DESELECT')
-		ob = bpy.data.objects[o.object_name]
+		ob = o.object
 		o.objects = [ob]
 	elif o.geometry_source == 'COLLECTION':
 		collection = bpy.data.collections[o.collection_name]
@@ -238,7 +238,7 @@ def getChangeData(o):
 	changedata = ''
 	obs = []
 	if o.geometry_source == 'OBJECT':
-		obs = [bpy.data.objects[o.object_name]]
+		obs = [o.object]
 	elif o.geometry_source == 'COLLECTION':
 		obs = bpy.data.collections[o.collection_name].objects
 	for ob in obs:
@@ -433,7 +433,7 @@ def sampleChunks(o, pathSamples, layers):
 
 	zinvert = 0
 	if o.inverse:
-		ob = bpy.data.objects[o.object_name]
+		ob = o.object
 		zinvert = ob.location.z + maxz	# ob.bound_box[6][2]
 
 	n = 0

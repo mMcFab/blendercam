@@ -72,6 +72,7 @@ def updateOperation(self, context):
     scene = context.scene
     ao = scene.cam_operations[scene.cam_active_operation]
     ao.warnings = ''
+    self.changed = True
     
     if ao.hide_all_others == True:
         for _ao in scene.cam_operations:
@@ -267,15 +268,16 @@ def operationValid(self, context):
     o.warnings = ""
     o = bpy.context.scene.cam_operations[bpy.context.scene.cam_active_operation]
     if o.geometry_source == 'OBJECT':
-        if not o.object_name in bpy.data.objects:
-            o.valid = False;
+       # if not o.object_name in bpy.data.objects:
+        if o.object is None:
+            o.valid = False
             o.warnings = invalidmsg
     if o.geometry_source == 'COLLECTION':
         if not o.collection_name in bpy.data.collections:
-            o.valid = False;
+            o.valid = False
             o.warnings = invalidmsg
         elif len(bpy.data.collections[o.collection_name].objects) == 0:
-            o.valid = False;
+            o.valid = False
             o.warnings = invalidmsg
 
     if o.geometry_source == 'IMAGE':
@@ -680,6 +682,9 @@ class camOperation(bpy.types.PropertyGroup):
         default=False)
     object_name: bpy.props.StringProperty(name='Object', description='object handled by this operation',
                                           update=updateOperationValid)
+    object: bpy.props.PointerProperty(name='Object', description='object handled by this operation',
+                                          update=updateOperationValid, type=bpy.types.Object)
+
     collection_name: bpy.props.StringProperty(name='Collection', description='Object collection handled by this operation',
                                          update=updateOperationValid)
     curve_object: bpy.props.StringProperty(name='Curve source',
