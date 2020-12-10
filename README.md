@@ -12,6 +12,7 @@ This fork focuses mainly on user interface changes. I know I'm not as clever as 
 Unfortunately, old tool pre-sets can't just be imported directly into my modified system, so you'll need to manually copy the values over if you switch from the original repo. Operation presets will copy around mostly, but step-over and tools will need to be specified
 
 I haven't tested this with OpenCAMLib yet, since I don't have the disk space free to install the tools to build it oops. I did update the code that seems to update it though
+**NEVER MIND I MADE THE SPACE AND ATTEMPTED TO BUILD OPENCAMLIB BUT IT KEEPS FAILING AND I JUST CAN'T FIGURE OUT WHAT I'M MISSING. I MANAGED TO BUILD IT IN LINUX BUT I DON'T USE LINUX AND .SO FILES ARE NOT WINDOWS COMPATIBLE. I NEED A .PYD OR SOMETHING. IF SOMEONE HAS A STEP-BY-STEP GUIDE TO BUILDING AND INSTALLING IT ON WINDOWS FROM THE GROUND UP THAT WOULD BE HIGHLY APPRECIATED**
 
 A few more specific changes: 
 
