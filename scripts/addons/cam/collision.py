@@ -191,22 +191,31 @@ def prepareBulletCollision(o):
         if o.exact_subdivide_edges:
             subdivideLongEdges(collisionob, cutter_props.cutter_diameter * 2)
 
+        
+
         bpy.ops.rigidbody.object_add(type='ACTIVE')  # using active instead of passive because of performance.TODO: check if this works also with 4axis...
         collisionob.rigid_body.collision_shape = 'MESH'
         collisionob.rigid_body.kinematic = True  # this fixed a serious bug and gave big speedup, rbs could move since they are now active...
         collisionob.rigid_body.collision_margin = o.skin * BULLET_SCALE
+        if o.use_modifiers:
+            collisionob.rigid_body.mesh_source = 'FINAL'
+        collisionob.rigid_body.use_margin = True
+        collisionob.rigid_body.enabled = True
         bpy.ops.transform.resize(value=(BULLET_SCALE, BULLET_SCALE, BULLET_SCALE),
                                  constraint_axis=(False, False, False), orient_type='GLOBAL', mirror=False,
                                  use_proportional_edit=False, proportional_edit_falloff='SMOOTH', proportional_size=1,
                                  snap=False, snap_target='CLOSEST', snap_point=(0, 0, 0), snap_align=False,
                                  snap_normal=(0, 0, 0), texture_space=False, release_confirm=False)
         collisionob.location = collisionob.location * BULLET_SCALE
+        
         bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
         bpy.context.view_layer.objects.active = collisionob
         
         for collection in collisionob.users_collection:
-            collection.objects.unlink(collisionob)
+            if(collection is not s.rigidbody_world.collection):
+                collection.objects.unlink(collisionob)
         
+        #rigidbody_world.collection.objects.link(collisionob)
         #if collisionob in active_collection.objects:
         #    active_collection.objects.unlink(collisionob)
         
@@ -234,6 +243,7 @@ def prepareBulletCollision(o):
 
 
 def cleanupBulletCollision(o):
+    #return
     if bpy.data.objects.find('machine') > -1:
         machinepresent = True
     else:
