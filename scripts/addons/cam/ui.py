@@ -240,12 +240,17 @@ class CAM_CHAINS_Panel(CAMButtonsPanel, bpy.types.Panel):
 
                         if not chain.computing:
                             if chain.valid:
+                                if(bpy.context.mode == 'OBJECT'):
+                            
+                                    layout.operator("object.calculate_cam_paths_chain", text="Calculate Sequence Paths")
+                                    row = layout.row(align=True)
+                                    row.operator("object.cam_simulate_chain", text="Simulate Sequence")
+                                    row.operator("object.cam_export_paths_chain", text="Export gcode")
+                                    # layout.operator("object.calculate_cam_paths_background", text="Calculate path in background")
+                                else:
+                                    layout.box().label(text="Calculate & Export only in Object Mode")
+
                                 
-                                layout.operator("object.calculate_cam_paths_chain", text="Calculate Sequence Paths")
-                                row = layout.row(align=True)
-                                row.operator("object.cam_simulate_chain", text="Simulate Sequence")
-                                row.operator("object.cam_export_paths_chain", text="Export gcode")
-                                # layout.operator("object.calculate_cam_paths_background", text="Calculate path in background")
                             
                             else:
                                 layout.label(text="Sequence invalid, can't compute")
@@ -307,18 +312,21 @@ class CAM_OPERATIONS_Panel(CAMButtonsPanel, bpy.types.Panel):
                 if not ao.computing:
                     if ao.valid:
                         row = layout.row(align=True)
-                        row.operator("object.calculate_cam_path", text="Calculate")
+                        if(bpy.context.mode == 'OBJECT'):
+                            row.operator("object.calculate_cam_path", text="Calculate")
 
                         #hidden as it doesn't currently work
                         #row.operator("object.calculate_cam_paths_background", text="Calculate in BG")
 
                         
-                        if ao.name is not None:
-                            name = "cam_path_{}".format(ao.name)
-                            if scene.objects.get(name) is not None:
-                                row = layout.row(align=True)
-                                row.operator("object.cam_simulate", text="Simulate")
-                                row.operator("object.cam_export", text="Export gcode")
+                            if ao.name is not None:
+                                name = "cam_path_{}".format(ao.name)
+                                if scene.objects.get(name) is not None:
+                                    row = layout.row(align=True)
+                                    row.operator("object.cam_simulate", text="Simulate")
+                                    row.operator("object.cam_export", text="Export gcode")
+                        else:
+                            row.box().label(text="Calculate & Export only in Object Mode")
                         
                         
                         
