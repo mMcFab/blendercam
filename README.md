@@ -18,14 +18,15 @@ A few more specific changes:
 
 * "Distance between lines" is no longer a constant measurement and has been replaced with "Tool Stepover", which is a percentage of the diameter of the active tool instead
 * Lots of names have been changed for consistency with other programs and hopefully reducing confusion - eg. Chains -> Sequences, Bridges -> Tabs, etc
-* Menus that require an operation are now nested within the operations menu. Menu options have been moved around and re-organised to be grouped in a semi-logical order
+* Menus that require an operation are now nested within the operations menu. Menu options have been moved around and re-organised to be grouped in what seems like a logical order to me
 * Lots of labelling and layout.box() used to make it easier to scan for options. The subtle changes in grey that Blender uses by default make it very difficult for me to distinguish when one set of options ends and another set starts - boxes help a lot
 * Names of tools, operations and sequences are validated and made unique whenever possible, since some things depend on the names being unique and consistent. 
 * Operation names are properly sync'd with chains/sequences, and are removed from a sequence when deleted. This may require you to "rename" a sequence or operation to the same name for it to prepare the correct things to work properly if your chain/operation was created in a different/earlier version of BlenderCam
-* Process in background was hidden since it doesn't seem to work right now
-* Unused settings are hidden for now
+* Process in background was hidden since it doesn't seem to work right now. 
+* Some unused settings are hidden for now
 * Exporting now uses a file dialog instead of silently outputting the file into the Blender document directory. Default names are formatted as "\[document\]_\[operation/sequence\].extension
 * (fixed) and made sequence simulation use the full material bounds of all the operations it performs, rather than just the first
+* All bundled presets have been updated to work with the new system where possible
 
 # WARNING:
 The Marlin export sets the machine position to 0,0,0 at the start of the job and **disables software endstops** so that it can cut at negative Z - this means if you are not careful, you could damage your machine! Please test, check and simulate your exported g-code carefully before use! I won't be liable for any damage you may cause with the generated G-Codes
