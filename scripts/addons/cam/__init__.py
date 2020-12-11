@@ -836,7 +836,7 @@ class camOperation(bpy.types.PropertyGroup):
     # cutter_description: StringProperty(name="Tool Description", default="", update=updateOffsetImage)
 
     # steps
-    tool_stepover: bpy.props.FloatProperty(name="Tool Stepover", default=50, min=1, soft_max=100, get=getToolStepover, set=setToolStepover,
+    tool_stepover: bpy.props.FloatProperty(name="Tool Stepover", default=45, min=1, soft_max=100, get=getToolStepover, set=setToolStepover,
                                                  precision=1, subtype="PERCENTAGE", unit="NONE", update=updateRest, description="Percentage of the tool diameter to have between each path")
     
     #use_fixed_distance_between_paths: bpy.props.BoolProperty(name="Use Fixed Stepover", default=False)
