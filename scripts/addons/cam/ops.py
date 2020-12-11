@@ -1505,6 +1505,12 @@ class CuttingToolCopy(bpy.types.Operator):
         if(len(s.cam_cutting_tools) < 1):
             return {'FINISHED'}
 
+        max_existing_id = -1
+        max_existing_static_id = -1
+        for tool in s.cam_cutting_tools:
+            max_existing_id = max(max_existing_id, tool.cutter_id)
+            #print(int(tool.cutter_static_id))
+            max_existing_static_id = max(max_existing_static_id, (tool.cutter_static_id))
         
         s.cam_cutting_tools.add()
         copyop = s.cam_cutting_tools[s.cam_active_cutting_tool]
@@ -1533,7 +1539,9 @@ class CuttingToolCopy(bpy.types.Operator):
             o.cutter_name = o.cutter_name + '_copy'
 
         #o.validateToolName()
-
+        o.cutter_static_id = (max_existing_static_id + 1)
+        o.cutter_id = max_existing_id + 1
+        
         return {'FINISHED'}
 
 
