@@ -1,5 +1,5 @@
 # Custom fork of BlenderCAM with some simple (but potentially useful) features and changes!
-This fork focuses mainly on user interface changes. I know I'm not as clever as the people who've written the actual CAM part of this, but I can at least make it easier for a person to use it without it crashing and hopefully reduce the overwhelming-ness of all the options. That said, I have fixed a couple of bugs too. 
+This fork focuses mainly on user interface changes. I know I'm not as clever as the people who've written the actual CAM part of this, but I can at least try make it easier for the average person to use it by hopefully reducing the overwhelming-ness of all the options and preventing crashes caused by certain options arrangements or Blender states, replacing them instead with messages telling the user _why_ they can't do the thing they just did or are trying to do. That said, I have fixed a couple of bugs too. 
 
 * Scene menu selection is no longer "Cam", but "BlenderCAM", to really remind you what it is you're using!
 * Reworked UI with a new, more compact default layout that tries to create better "flow" when setting up operations, as well as new names that I find easier to understand
