@@ -727,14 +727,19 @@ class CAM_MOVEMENT_Panel(CAMButtonsPanel, bpy.types.Panel):
                     if use_experimental:
                         col.prop(ao, 'outlines_count')
                         if ao.outlines_count > 1:
-                            col.prop(ao, 'tool_stepover')
+                            row = col.row(align=True)
+                            row.prop(ao, 'tool_stepover')
+                            row.prop(ao, 'dist_between_paths')
+
                             col.prop(ao, 'movement_insideout')
                     
                 elif ao.strategy == 'WATERLINE':
                     col.prop(ao, 'slice_detail')
                     col.prop(ao, 'waterline_fill')
                     if ao.waterline_fill:
-                        col.prop(ao, 'tool_stepover')
+                        row = col.row(align=True)
+                        row.prop(ao, 'tool_stepover')
+                        row.prop(ao, 'dist_between_paths')
                         col.prop(ao, 'waterline_project')
                     #col.prop(ao, 'inverse')
                 elif ao.strategy == 'CARVE':
@@ -752,15 +757,21 @@ class CAM_MOVEMENT_Panel(CAMButtonsPanel, bpy.types.Panel):
                     col.prop(ao, 'crazy_threshold2')
                     col.prop(ao, 'crazy_threshold3')
                     col.prop(ao, 'crazy_threshold4')
-                    col.prop(ao, 'tool_stepover')
+                    row = col.row(align=True)
+                    row.prop(ao, 'tool_stepover')
+                    row.prop(ao, 'dist_between_paths')
                     col.prop(ao, 'dist_along_paths')
                 elif ao.strategy == 'DRILL':
                     col.prop(ao, 'drill_type')
                 elif ao.strategy == 'POCKET':
                     col.prop(ao, 'pocket_option')
-                    col.prop(ao, 'tool_stepover')
+                    row = col.row(align=True)
+                    row.prop(ao, 'tool_stepover')
+                    row.prop(ao, 'dist_between_paths')
                 else:
-                    col.prop(ao, 'tool_stepover')
+                    row = col.row(align=True)
+                    row.prop(ao, 'tool_stepover')
+                    row.prop(ao, 'dist_between_paths')
                     col.prop(ao, 'dist_along_paths')
                     if ao.strategy == 'PARALLEL' or ao.strategy == 'CROSS':
                         col.prop(ao, 'parallel_angle')

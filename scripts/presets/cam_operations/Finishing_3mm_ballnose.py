@@ -15,6 +15,7 @@ o.cutter_tip_angle = 60.0
 o.cutter_type = 'BALL'
 o.dist_along_paths = 0.0002
 o.tool_stepover = 16.7
+o.dist_between_paths = 0.0005
 o.dont_merge = False
 o.duration = 96.3156509399414
 o.feedrate = 1.0

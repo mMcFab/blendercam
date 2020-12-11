@@ -664,6 +664,24 @@ def getChainName(self):
     return self["name"]
 
 
+def setToolStepover(self, value):
+    self["tool_stepover"] = value
+
+def getToolStepover(self):
+    return self["tool_stepover"]
+
+def setToolPathdist(self, value):
+    _tool = self.getOpCuttingTool()
+    self["dist_between_paths"] = value
+    if(_tool is not None):
+        self["tool_stepover"] = value / (_tool.cutter_diameter / 100)
+
+def getToolPathdist(self):
+    _tool = self.getOpCuttingTool()
+    if(_tool is not None):
+        return self["tool_stepover"] * (_tool.cutter_diameter / 100)
+    return 0
+
 
 class camOperation(bpy.types.PropertyGroup):
     name: bpy.props.StringProperty(name="Name", default="Operation", get=getCamOpName, set=updateCamOperationName)#, update=updateCamOperationName)
@@ -818,11 +836,12 @@ class camOperation(bpy.types.PropertyGroup):
     # cutter_description: StringProperty(name="Tool Description", default="", update=updateOffsetImage)
 
     # steps
-    tool_stepover: bpy.props.FloatProperty(name="Tool Stepover", default=50, min=1, max=100,
+    tool_stepover: bpy.props.FloatProperty(name="Tool Stepover", default=50, min=1, soft_max=100, get=getToolStepover, set=setToolStepover,
                                                  precision=1, subtype="PERCENTAGE", unit="NONE", update=updateRest, description="Percentage of the tool diameter to have between each path")
     
-    #dist_between_paths: bpy.props.FloatProperty(name="Distance between toolpaths", default=0.001, min=0.00001, max=32,
-    #                                             precision=PRECISION, unit="LENGTH", update=updateRest)
+    #use_fixed_distance_between_paths: bpy.props.BoolProperty(name="Use Fixed Stepover", default=False)
+    dist_between_paths: bpy.props.FloatProperty(name="Distance Between Toolpaths", default=0.001, min=0.00001, max=32, step=0.005, set=setToolPathdist, get=getToolPathdist,
+                                                 precision=PRECISION, unit="LENGTH", update=updateRest)
 
 
     dist_along_paths: bpy.props.FloatProperty(name="Distance along toolpaths", default=0.0002, min=0.00001, max=32,
@@ -1284,7 +1303,7 @@ class AddPresetCamOperation(bl_operators.presets.AddPresetBase, Operator):
                      'o.spindle_rpm', 'o.ambient_behaviour', 'o.source_image_scale_z',
                      'o.source_image_size_x', 'o.curve_object', 'o.curve_object1',
                      'o.ambient_radius', 'o.simulation_detail', 'o.update_offsetimage_tag',
-                     'o.tool_stepover', 'o.max', 'o.min', 'o.pixsize', 'o.slice_detail', 'o.parallel_step_back',
+                     'o.tool_stepover', 'o.dist_between_paths', 'o.max', 'o.min', 'o.pixsize', 'o.slice_detail', 'o.parallel_step_back',
                      'o.drill_type', 'o.source_image_name', 'o.dont_merge', 'o.update_silhouete_tag',
                      'o.material_origin', 'o.inverse', 'o.waterline_fill', 'o.source_image_offset', 'o.circle_detail',
                      'o.strategy', 'o.update_zbufferimage_tag', 'o.stepdown', 'o.feedrate', 
