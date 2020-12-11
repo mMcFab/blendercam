@@ -34,6 +34,11 @@ The Marlin export sets the machine position to 0,0,0 at the start of the job and
 You may also need to home X and Y before a job, then move to the 0 position after (that usually being the bottom-left of the job, with the tool tip touching the workpiece)
 
 
+# Sneaky alternate UI pic:
+
+![BlenderCAM](./static/altUISnippet.PNG)
+
+
 # Below is the original ReadMe, which I have kept since it has a bunch of useful links
 
 
