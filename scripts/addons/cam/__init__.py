@@ -521,7 +521,7 @@ def validateToolName(self, val):
     #updateToolsRest(self, context)
 
 def getToolName(self):
-    return self["cutter_name"]
+    return self.get("cutter_name", "Tool")
 
 
 
@@ -641,7 +641,7 @@ def updateCamOperationName(o, value):
     return
 
 def getCamOpName(o):
-    return o["name"]
+    return o.get("name", "Cut")
 
 def validateChainName(self, val):
     temp_name = val
@@ -661,7 +661,7 @@ def validateChainName(self, val):
     self["name"] = temp_name
 
 def getChainName(self):
-    return self["name"]
+    return self.get("name", "Sequence")
 
 
 def setToolStepover(self, value):
