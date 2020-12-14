@@ -667,10 +667,14 @@ def getChainName(self):
 def setToolStepover(self, value):
     self["tool_stepover"] = value
 
+
+DEFAULT_TOOL_STEPOVER_PERCENT = 45
+
 def getToolStepover(self):
-    return self["tool_stepover"]
+    return self.get("tool_stepover", DEFAULT_TOOL_STEPOVER_PERCENT)#self["tool_stepover"]
 
 def setToolPathdist(self, value):
+    print("i am ruining your afternoon")
     _tool = self.getOpCuttingTool()
     self["dist_between_paths"] = value
     if(_tool is not None):
@@ -679,7 +683,7 @@ def setToolPathdist(self, value):
 def getToolPathdist(self):
     _tool = self.getOpCuttingTool()
     if(_tool is not None):
-        return self["tool_stepover"] * (_tool.cutter_diameter / 100)
+        return self.get("tool_stepover", DEFAULT_TOOL_STEPOVER_PERCENT) * (_tool.cutter_diameter / 100)
     return 0
 
 
@@ -836,12 +840,14 @@ class camOperation(bpy.types.PropertyGroup):
     # cutter_description: StringProperty(name="Tool Description", default="", update=updateOffsetImage)
 
     # steps
-    tool_stepover: bpy.props.FloatProperty(name="Tool Stepover", default=45, min=1, soft_max=100, get=getToolStepover, set=setToolStepover,
-                                                 precision=1, subtype="PERCENTAGE", unit="NONE", update=updateRest, description="Percentage of the tool diameter to have between each path")
-    
     #use_fixed_distance_between_paths: bpy.props.BoolProperty(name="Use Fixed Stepover", default=False)
     dist_between_paths: bpy.props.FloatProperty(name="Distance Between Toolpaths", default=0.001, min=0.00001, max=32, step=0.005, set=setToolPathdist, get=getToolPathdist,
                                                  precision=PRECISION, unit="LENGTH", update=updateRest)
+                                                 
+    tool_stepover: bpy.props.FloatProperty(name="Tool Stepover", default=DEFAULT_TOOL_STEPOVER_PERCENT, min=1, soft_max=100, get=getToolStepover, set=setToolStepover,
+                                                 precision=1, subtype="PERCENTAGE", unit="NONE", update=updateRest, description="Percentage of the tool diameter to have between each path")
+    
+    
 
 
     dist_along_paths: bpy.props.FloatProperty(name="Distance along toolpaths", default=0.0002, min=0.00001, max=32,
