@@ -73,36 +73,40 @@ def updateOperation(self, context):
     ao = scene.cam_operations[scene.cam_active_operation]
     ao.warnings = ''
     ao.changed = True
-    
-    if ao.hide_all_others == True:
-        for _ao in scene.cam_operations:
-            if _ao.path_object_name in bpy.data.objects:
-                other_obj = bpy.data.objects[_ao.path_object_name]
-                current_obj = bpy.data.objects[ao.path_object_name]
-                if other_obj != current_obj:
-                    other_obj.hide = True
-                    other_obj.select = False
-    else:
-        for path_obj_name in was_hidden_dict:
-            print(was_hidden_dict)
-            if was_hidden_dict[path_obj_name] == True:
-                # Find object and make it hidde, then reset 'hidden' flag
-                obj = bpy.data.objects[path_obj_name]
-                obj.hide = True
-                obj.select = False
-                was_hidden_dict[path_obj_name] = False
+    #print("name")
+    #print(ao.path_object_name)
+    if(ao.path_object_name in bpy.data.objects):
+        if ao.hide_all_others == True:
+            for _ao in scene.cam_operations:
+                if _ao.path_object_name in bpy.data.objects:
+                    
+                    other_obj = bpy.data.objects[_ao.path_object_name]
+                    current_obj = bpy.data.objects[ao.path_object_name]
+                    if other_obj != current_obj:
+                        other_obj.hide = True
+                        other_obj.select = False
+        else:
+            for path_obj_name in was_hidden_dict:
+                print(was_hidden_dict)
+                if was_hidden_dict[path_obj_name] == True:
+                    # Find object and make it hidde, then reset 'hidden' flag
+                    obj = bpy.data.objects[path_obj_name]
+                    obj.hide = True
+                    obj.select = False
+                    was_hidden_dict[path_obj_name] = False
 
     # try highlighting the object in the 3d view and make it active
     bpy.ops.object.select_all(action='DESELECT')
     # highlight the cutting path if it exists
     try:
-        ob = bpy.data.objects[ao.path_object_name]
-        ob.select_set(state=True, view_layer=None)
-        # Show object if, it's was hidden
-        if ob.hide == True:
-            ob.hide = False
-            was_hidden_dict[ao.path_object_name] = True
-        bpy.context.scene.objects.active = ob
+        if(ao.path_object_name in bpy.data.objects):
+            ob = bpy.data.objects[ao.path_object_name]
+            ob.select_set(state=True, view_layer=None)
+            # Show object if, it's was hidden
+            if ob.hide == True:
+                ob.hide = False
+                was_hidden_dict[ao.path_object_name] = True
+            bpy.context.scene.objects.active = ob
     except Exception as e:
         print(e)
 
