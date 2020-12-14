@@ -298,8 +298,8 @@ def operationValid(self, context):
         
     o.update_offsetimage_tag = True
     o.update_zbufferimage_tag = True
-    print('validity ')
-    print(o.valid)
+    #print('validity ')
+    #print(o.valid)
 
 
 
@@ -678,7 +678,6 @@ def getToolStepover(self):
     return self.get("tool_stepover", DEFAULT_TOOL_STEPOVER_PERCENT)#self["tool_stepover"]
 
 def setToolPathdist(self, value):
-    print("i am ruining your afternoon")
     _tool = self.getOpCuttingTool()
     self["dist_between_paths"] = value
     if(_tool is not None):
