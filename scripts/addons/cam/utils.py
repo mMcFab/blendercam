@@ -1107,6 +1107,9 @@ def chunksToMesh(chunks, o):
 		ob = s.objects[oname]
 	else:
 		ob = object_utils.object_data_add(bpy.context, mesh, operator=None)
+	
+	#Makes the path properly visible on my Ubuntu machine
+	ob.show_wire = True
 
 	if o.machine_axes != '3':
 		# store rotations into shape keys, only way to store large arrays with correct floating point precision - object/mesh attributes can only store array up to 32000 intems.
