@@ -72,7 +72,7 @@ def updateOperation(self, context):
     scene = context.scene
     ao = scene.cam_operations[scene.cam_active_operation]
     ao.warnings = ''
-    self.changed = True
+    ao.changed = True
     
     if ao.hide_all_others == True:
         for _ao in scene.cam_operations:
