@@ -1336,8 +1336,8 @@ def imageToChunks(o, image, with_border=False):
     minx, miny, minz, maxx, maxy, maxz = o.min.x, o.min.y, o.min.z, o.max.x, o.max.y, o.max.z
     pixsize = o.pixsize
 
-    #Code from the waterline fix commit
     image = image.astype(numpy.uint8)
+
     # progress('detecting outline')
     edges = []
     ar = image[:, :-1] - image[:, 1:]
